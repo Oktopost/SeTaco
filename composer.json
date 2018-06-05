@@ -1,0 +1,21 @@
+{
+	"name": "oktopost/se-taco",
+	"authors": 
+	[
+		
+	],
+	"minimum-stability": "stable",
+	"autoload":
+	{
+		"psr-4": 
+		{
+			"SeTaco\\": "Source/"
+		}
+	},
+	"require": {
+		"unstable-cacao/traitor": "^1.0",
+		"unstable-cacao/structura": "^1.0",
+		"oktopost/objection": "^1.0",
+		"facebook/webdriver": "^1.6"
+	}
+}
