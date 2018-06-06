@@ -2,14 +2,14 @@
 namespace SeTaco\Unit;
 
 
-use PHPUnit\Framework\TestCase;
+use Unitest\Wrappers\PHPUnit\UnitestCase;
 
 use SeTaco\DriverConfig;
 use SeTaco\Config\ServerSetup;
 use SeTaco\Config\HomepageConfig;
 
 
-class SanityTest extends TestCase
+class SanityTest extends UnitestCase
 {
 	public function test_Objects()
 	{

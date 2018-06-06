@@ -2,26 +2,26 @@
 namespace SeTaco\Unit\Config;
 
 
-use PHPUnit\Framework\TestCase;
 use SeTaco\Config\HomepageConfig;
+use Unitest\Wrappers\PHPUnit\UnitestCase;
 
 
-class HomepageConfigTest extends TestCase
+class HomepageConfigTest extends UnitestCase
 {
-	private function subject(array $data = []): HomepageConfig
+	public function subject(array $data = []): HomepageConfig
 	{
 		return (new HomepageConfig())->fromArray($data);
 	}
 	
 	
-	public function test_getURL_FullURLHttpPassed_SameURLReturned()
+	public function test_getURL_FullURLHttpPassed_SameURLReturned(HomepageConfig $config): void
 	{
-		self::assertEquals('http://www.oktopost.com', $this->subject()->getURL('http://www.oktopost.com'));
+		self::assertEquals('http://www.oktopost.com', $config->getURL('http://www.oktopost.com'));
 	}
 	
-	public function test_getURL_FullURLHttpsPassed_SameURLReturned()
+	public function test_getURL_FullURLHttpsPassed_SameURLReturned(HomepageConfig $config): void
 	{
-		self::assertEquals('https://www.oktopost.com', $this->subject()->getURL('https://www.oktopost.com'));
+		self::assertEquals('https://www.oktopost.com', $config->getURL('https://www.oktopost.com'));
 	}
 	
 	public function test_getURL_PassEmptyString_ReturnConfigURL()

@@ -1,15 +1,15 @@
 <?php
 namespace SeTaco\Unit;
 
-	
-use PHPUnit\Framework\TestCase;
 
 use SeTaco\OSType;
 use SeTaco\BrowserType;
 use SeTaco\DriverConfig;
 
+use Unitest\Wrappers\PHPUnit\UnitestCase;
 
-class DriverConfigTest extends TestCase
+
+class DriverConfigTest extends UnitestCase
 {
 	public function test_PassEmptyArray_DefaultValuesReturned()
 	{

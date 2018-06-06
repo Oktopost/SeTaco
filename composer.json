@@ -4,7 +4,8 @@
 	"type": "library",
 	"license": "MIT",
 	"homepage": "https://github.com/Oktopost/SeTaco",
-	"authors": [
+	"authors":
+	[
 		{
 			"name": "Alexey Puchkov",
 			"email": "alexey@oktopost.com",
@@ -19,16 +20,22 @@
 			"SeTaco\\": "Source/"
 		}
 	},
-	"require": {
+	"require": 
+	{
+		"oktopost/unitest": "^1.0.0",
 		"unstable-cacao/traitor": "^1.0",
 		"unstable-cacao/structura": "^1.0",
 		"oktopost/objection": "^1.0",
 		"facebook/webdriver": "^1.6",
+		"oktopost/cartograph": "^1.1"
+	},
+	"require-dev":
+	{
 		"phpunit/phpunit": "^7.2",
-		"oktopost/cartograph": "^1.1",
 		"php-coveralls/php-coveralls": "^2.1"
 	},
-    "scripts": {
+    "scripts": 
+	{
         "test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests",
         "unit-test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --group unit",
         "integration-test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --group integration",
