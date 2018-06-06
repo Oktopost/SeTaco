@@ -1,8 +1,15 @@
 {
 	"name": "oktopost/se-taco",
-	"authors": 
-	[
-		
+    "description": "Wrapper for the package facebook/webdriver",
+	"type": "library",
+	"license": "MIT",
+	"homepage": "https://github.com/Oktopost/SeTaco",
+	"authors": [
+		{
+			"name": "Alexey Puchkov",
+			"email": "alexey@oktopost.com",
+			"role": "Developer"
+		}
 	],
 	"minimum-stability": "stable",
 	"autoload":
@@ -16,6 +23,15 @@
 		"unstable-cacao/traitor": "^1.0",
 		"unstable-cacao/structura": "^1.0",
 		"oktopost/objection": "^1.0",
-		"facebook/webdriver": "^1.6"
-	}
+		"facebook/webdriver": "^1.6",
+		"phpunit/phpunit": "^7.2"
+	},
+    "scripts": {
+        "test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests",
+        "unit-test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --group unit",
+        "integration-test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --group integration",
+        "test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover",
+        "unit-test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover --group unit",
+        "integration-test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover --group integration"
+    }
 }
