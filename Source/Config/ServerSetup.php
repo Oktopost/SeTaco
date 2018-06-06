@@ -26,9 +26,9 @@ class ServerSetup extends LiteObject
 	protected function _setup()
 	{
 		return [
-			'OS'			=> LiteSetup::createEnum(OSType::class, OSType::ANY),
-			'Browser'		=> LiteSetup::createEnum(BrowserType::class, BrowserType::CHROME),
-			'ServerURL'		=> LiteSetup::createString('http://127.0.0.1:4444/wd/hub')
+			'OS'		=> LiteSetup::createEnum(OSType::class, OSType::ANY),
+			'Browser'	=> LiteSetup::createEnum(BrowserType::class, BrowserType::CHROME),
+			'ServerURL'	=> LiteSetup::createString('http://127.0.0.1:4444/wd/hub')
 		];
 	}
 	
@@ -36,8 +36,8 @@ class ServerSetup extends LiteObject
 	public function getDesiredCapabilities(): DesiredCapabilities
 	{
 		return new DesiredCapabilities([
-			WebDriverCapabilityType::BROWSER_NAME	=> $this->Server->Browser,
-			WebDriverCapabilityType::PLATFORM		=> $this->Server->OS,
+			WebDriverCapabilityType::BROWSER_NAME	=> $this->Browser,
+			WebDriverCapabilityType::PLATFORM		=> $this->OS,
 		]);
 	}
 	

@@ -2,8 +2,9 @@
 namespace SeTaco;
 
 
-use SeTaco\Decorators\BrowserDecorator;
 use SeTaco\Exceptions\SeTacoException;
+use SeTaco\Decorators\BrowserDecorator;
+
 
 class Session
 {

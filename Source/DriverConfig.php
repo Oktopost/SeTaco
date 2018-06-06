@@ -2,10 +2,8 @@
 namespace SeTaco;
 
 
-use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
-use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 use Objection\LiteSetup;
 use Objection\LiteObject;
 
