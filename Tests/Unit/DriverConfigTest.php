@@ -3,9 +3,10 @@ namespace SeTaco\Unit;
 
 	
 use PHPUnit\Framework\TestCase;
+
+use SeTaco\OSType;
 use SeTaco\BrowserType;
 use SeTaco\DriverConfig;
-use SeTaco\OSType;
 
 
 class DriverConfigTest extends TestCase
