@@ -13,8 +13,8 @@ class SanityTest extends TestCase
 {
 	public function test_Objects()
 	{
-		$a = new HomepageConfig();
-		$b = new ServerSetup();
-		$c = new DriverConfig();
+		new HomepageConfig();
+		new ServerSetup();
+		new DriverConfig();
 	}
 }
