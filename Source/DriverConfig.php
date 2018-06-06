@@ -2,6 +2,10 @@
 namespace SeTaco;
 
 
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+
+use Facebook\WebDriver\Remote\WebDriverCapabilityType;
 use Objection\LiteSetup;
 use Objection\LiteObject;
 
@@ -25,6 +29,12 @@ class DriverConfig extends LiteObject
 			'Server'	=> LiteSetup::createInstanceOf(ServerSetup::class),
 			'Homepage'	=> LiteSetup::createInstanceOf(HomepageConfig::class)
 		];
+	}
+	
+	
+	public function createDriver(): RemoteWebDriver
+	{
+		return $this->Server->createDriver();
 	}
 	
 	

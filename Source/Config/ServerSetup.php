@@ -2,6 +2,10 @@
 namespace SeTaco\Config;
 
 
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\WebDriverCapabilityType;
+
 use Objection\LiteSetup;
 use Objection\LiteObject;
 
@@ -26,5 +30,19 @@ class ServerSetup extends LiteObject
 			'Browser'		=> LiteSetup::createEnum(BrowserType::class, BrowserType::CHROME),
 			'ServerURL'		=> LiteSetup::createString('http://127.0.0.1:4444/wd/hub')
 		];
+	}
+	
+	
+	public function getDesiredCapabilities(): DesiredCapabilities
+	{
+		return new DesiredCapabilities([
+			WebDriverCapabilityType::BROWSER_NAME	=> $this->Server->Browser,
+			WebDriverCapabilityType::PLATFORM		=> $this->Server->OS,
+		]);
+	}
+	
+	public function createDriver(): RemoteWebDriver
+	{
+		return RemoteWebDriver::create($this->ServerURL, $this->getDesiredCapabilities());
 	}
 }
