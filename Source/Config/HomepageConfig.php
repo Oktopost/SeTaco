@@ -19,8 +19,8 @@ class HomepageConfig extends LiteObject
 	protected function _setup()
 	{
 		return [
-			'URL'	=> LiteSetup::createString(),
-			'Port'	=> LiteSetup::createInt()
+			'URL'	=> LiteSetup::createString('http://localhost'),
+			'Port'	=> LiteSetup::createInt(80)
 		];
 	}
 }

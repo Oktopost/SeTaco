@@ -1,10 +1,12 @@
 <?php
-
 namespace SeTaco\Config;
 
 
-use Objection\LiteObject;
 use Objection\LiteSetup;
+use Objection\LiteObject;
+
+use SeTaco\OSType;
+use SeTaco\BrowserType;
 
 
 /**
@@ -20,9 +22,9 @@ class ServerSetup extends LiteObject
 	protected function _setup()
 	{
 		return [
-			'OS'			=> LiteSetup::createString(),
-			'Browser'		=> LiteSetup::createString(),
-			'ServerURL'		=> LiteSetup::createString()
+			'OS'			=> LiteSetup::createEnum(OSType::class, OSType::ANY),
+			'Browser'		=> LiteSetup::createEnum(BrowserType::class, BrowserType::CHROME),
+			'ServerURL'		=> LiteSetup::createString('http://127.0.0.1:4444/wd/hub')
 		];
 	}
 }
