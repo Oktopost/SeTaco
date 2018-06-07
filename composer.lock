@@ -242,16 +242,16 @@
         },
         {
             "name": "oktopost/unitest",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Oktopost/Unitest.git",
-                "reference": "b7cf795b7c12241fa88ae876f7c7fb27fde9a423"
+                "reference": "d5207e51d50a40b96894630e3169276d59d5482f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Oktopost/Unitest/zipball/b7cf795b7c12241fa88ae876f7c7fb27fde9a423",
-                "reference": "b7cf795b7c12241fa88ae876f7c7fb27fde9a423",
+                "url": "https://api.github.com/repos/Oktopost/Unitest/zipball/d5207e51d50a40b96894630e3169276d59d5482f",
+                "reference": "d5207e51d50a40b96894630e3169276d59d5482f",
                 "shasum": ""
             },
             "require": {
@@ -278,7 +278,7 @@
                 }
             ],
             "homepage": "https://github.com/Oktopost/Unitest",
-            "time": "2018-06-07T05:03:44+00:00"
+            "time": "2018-06-07T06:39:41+00:00"
         },
         {
             "name": "symfony/process",
