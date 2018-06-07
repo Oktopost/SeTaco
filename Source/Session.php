@@ -6,7 +6,7 @@ use SeTaco\Exceptions\SeTacoException;
 use SeTaco\Decorators\BrowserDecorator;
 
 
-class Session
+class Session implements ISession
 {
 	/** @var DriverConfig */
 	private $config;
@@ -16,6 +16,9 @@ class Session
 	
 	/** @var Browser */
 	private $current = null;
+	
+	/** @var BrowserAssert|null */
+	private $assert = null;
 	
 	
 	private function getSetCurrentCallback(IBrowser $browser): callable
@@ -54,7 +57,7 @@ class Session
 		return $this->config;
 	}
 	
-	public function clear()
+	public function clear(): void
 	{
 		foreach ($this->browsers as $browser)
 		{
@@ -71,5 +74,13 @@ class Session
 				'Make sure the browser was not closed before calling current');
 		
 		return $this->current;
+	}
+	
+	public function assert(): IBrowserAssert
+	{
+		if (!$this->assert)
+			$this->assert = new BrowserAssert($this);
+		
+		return $this->assert;
 	}
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ecd69f7b803672ddb14af3d7db77f684",
+    "content-hash": "e619ddce5edb7a48353b706f0209b16d",
     "packages": [
         {
             "name": "facebook/webdriver",
@@ -242,16 +242,16 @@
         },
         {
             "name": "oktopost/unitest",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Oktopost/Unitest.git",
-                "reference": "c631f37b320dd3a55ef8240c33b334f2702c5960"
+                "reference": "b7cf795b7c12241fa88ae876f7c7fb27fde9a423"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Oktopost/Unitest/zipball/c631f37b320dd3a55ef8240c33b334f2702c5960",
-                "reference": "c631f37b320dd3a55ef8240c33b334f2702c5960",
+                "url": "https://api.github.com/repos/Oktopost/Unitest/zipball/b7cf795b7c12241fa88ae876f7c7fb27fde9a423",
+                "reference": "b7cf795b7c12241fa88ae876f7c7fb27fde9a423",
                 "shasum": ""
             },
             "require": {
@@ -278,7 +278,7 @@
                 }
             ],
             "homepage": "https://github.com/Oktopost/Unitest",
-            "time": "2018-06-06T15:12:06+00:00"
+            "time": "2018-06-07T05:03:44+00:00"
         },
         {
             "name": "symfony/process",
