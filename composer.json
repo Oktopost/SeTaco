@@ -22,7 +22,7 @@
 	},
 	"require": 
 	{
-		"oktopost/unitest": "^1.0.1",
+		"oktopost/unitest": "dev-master",
 		"unstable-cacao/traitor": "^1.0",
 		"unstable-cacao/structura": "^1.0",
 		"oktopost/objection": "^1.0",
