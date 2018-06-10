@@ -24,6 +24,7 @@ class Browser implements IBrowser
 	public function __construct(RemoteWebDriver $driver, DriverConfig $config)
 	{
 		$this->driver = $driver;
+		$this->config = $config;
 	}
 	
 	public function __destruct()
@@ -52,6 +53,21 @@ class Browser implements IBrowser
 	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser
 	{
 		$this->getElement($cssSelector, $timeout)->input($value);
+		return $this;
+	}
+	
+	public function formInput(array $elements, ?string $submit = null, float $timeout = 2.5): IBrowser
+	{
+		foreach ($elements as $css => $input)
+		{
+			$this->input($css, $input, $timeout);
+		}
+		
+		if ($submit)
+		{
+			$this->click($submit);
+		}
+		
 		return $this;
 	}
 	

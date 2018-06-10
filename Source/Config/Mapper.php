@@ -39,11 +39,11 @@ class Mapper implements IMapper
 			switch (strtolower($key))
 			{
 				case 'os': 
-					$obj->OS = $value;
+					$obj->OS = strtoupper($value);
 					break;
 					
 				case 'browser':
-					$obj->Browser = $value;
+					$obj->Browser = strtolower($value);
 					break;
 				
 				case 'url':

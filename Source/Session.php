@@ -67,6 +67,11 @@ class Session implements ISession
 		$this->browsers = [];
 	}
 	
+	public function hasCurrent(): bool
+	{
+		return $this->current && !$this->current->isDestroyed();
+	}
+	
 	public function current(): IBrowser
 	{
 		if (!$this->current || $this->current->isDestroyed())

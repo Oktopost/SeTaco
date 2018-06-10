@@ -39,17 +39,26 @@ class BrowserDecorator implements IBrowser
 	
 	public function goto(string $url): IBrowser
 	{
-		return $this->use()->goto($url);
+		$this->use()->goto($url);
+		return $this;
 	}
 	
 	public function click(string $cssSelector, float $timeout = 2.5): IBrowser
 	{
-		return $this->use()->click($cssSelector, $timeout);
+		$this->use()->click($cssSelector, $timeout);
+		return $this;
 	}
 	
 	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser
 	{
-		return $this->use()->input($cssSelector, $timeout);
+		$this->use()->input($cssSelector, $timeout);
+		return $this;
+	}
+	
+	public function formInput(array $elements, ?string $submit = null, float $timeout = 2.5): IBrowser
+	{
+		$this->use()->formInput($elements, $submit, $timeout);
+		return $this;
 	}
 	
 	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement
