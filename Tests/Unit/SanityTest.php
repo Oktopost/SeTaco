@@ -2,7 +2,7 @@
 namespace SeTaco\Unit;
 
 
-use Unitest\Wrappers\PHPUnit\UnitestCase;
+use CosmicRay\Wrappers\PHPUnit\UnitestCase;
 
 use SeTaco\DriverConfig;
 use SeTaco\Config\ServerSetup;

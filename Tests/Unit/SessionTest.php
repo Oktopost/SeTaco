@@ -2,10 +2,11 @@
 namespace SeTaco\Unit;
 
 
+use SeTaco\Session;
 use SeTaco\BrowserAssert;
 use SeTaco\DriverConfig;
-use SeTaco\Session;
-use Unitest\Wrappers\PHPUnit\UnitestCase;
+
+use CosmicRay\Wrappers\PHPUnit\UnitestCase;
 
 
 class SessionTest extends UnitestCase

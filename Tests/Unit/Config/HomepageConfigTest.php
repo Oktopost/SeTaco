@@ -3,7 +3,7 @@ namespace SeTaco\Unit\Config;
 
 
 use SeTaco\Config\HomepageConfig;
-use Unitest\Wrappers\PHPUnit\UnitestCase;
+use CosmicRay\Wrappers\PHPUnit\UnitestCase;
 
 
 class HomepageConfigTest extends UnitestCase

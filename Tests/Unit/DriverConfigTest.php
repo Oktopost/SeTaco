@@ -6,7 +6,7 @@ use SeTaco\OSType;
 use SeTaco\BrowserType;
 use SeTaco\DriverConfig;
 
-use Unitest\Wrappers\PHPUnit\UnitestCase;
+use CosmicRay\Wrappers\PHPUnit\UnitestCase;
 
 
 class DriverConfigTest extends UnitestCase
