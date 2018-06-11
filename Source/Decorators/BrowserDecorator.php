@@ -61,6 +61,16 @@ class BrowserDecorator implements IBrowser
 		return $this;
 	}
 	
+	public function waitForElement(string $cssSelector, float $timeout = 2.5): void
+	{
+		$this->use()->waitForElement($cssSelector, $timeout);
+	}
+	
+	public function hasElement(string $cssSelector, float $timeout = 2.5): bool
+	{
+		return $this->use()->tryGetElement($cssSelector, $timeout);
+	}
+	
 	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement
 	{
 		$element = $this->use()->getElement($cssSelector, $timeout);

@@ -71,6 +71,16 @@ class Browser implements IBrowser
 		return $this;
 	}
 	
+	public function waitForElement(string $cssSelector, float $timeout = 2.5): void
+	{
+		$this->getElement($cssSelector, $timeout);
+	}
+	
+	public function hasElement(string $cssSelector, float $timeout = 2.5): bool
+	{
+		return (bool)$this->tryGetElement($cssSelector, $timeout);
+	}
+	
 	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement
 	{
 		try

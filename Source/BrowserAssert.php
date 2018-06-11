@@ -2,6 +2,7 @@
 namespace SeTaco;
 
 
+use PHPUnit\Runner\Exception;
 use SeTaco\Exceptions\SeTacoException;
 
 
@@ -42,6 +43,16 @@ class BrowserAssert implements IBrowserAssert
 	{
 		$this->browser = $browser;
 		return $this;
+	}
+	
+	
+	public function URL(string $match): void
+	{
+		$target = $this->session->config()->Homepage->getURL($match);
+		$actual = $this->browser()->getURL();
+		
+		if ($target != $actual)
+			throw new Exception("Expected URL '$target' but got '$actual'");
 	}
 	
 	
