@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e619ddce5edb7a48353b706f0209b16d",
+    "content-hash": "c685481b4d05ee66f6d53229389297d8",
     "packages": [
         {
             "name": "facebook/webdriver",
@@ -149,6 +149,46 @@
             "time": "2018-06-06T07:53:06+00:00"
         },
         {
+            "name": "oktopost/cosmic-ray",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Oktopost/CosmicRay.git",
+                "reference": "678d8ffa8dc7c49f29455e5687a616258edb247e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Oktopost/CosmicRay/zipball/678d8ffa8dc7c49f29455e5687a616258edb247e",
+                "reference": "678d8ffa8dc7c49f29455e5687a616258edb247e",
+                "shasum": ""
+            },
+            "require": {
+                "unstable-cacao/narrator": "^1.0.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CosmicRay\\": "Source/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexey Puchkov",
+                    "email": "alexey@oktopost.com",
+                    "role": "Developer"
+                }
+            ],
+            "homepage": "https://github.com/Oktopost/CosmicRay",
+            "time": "2018-06-11T10:09:10+00:00"
+        },
+        {
             "name": "oktopost/objection",
             "version": "1.0.13",
             "source": {
@@ -239,46 +279,6 @@
             "description": "Inversion of Control library",
             "homepage": "https://github.com/Oktopost/Skeleton",
             "time": "2017-08-02T07:37:39+00:00"
-        },
-        {
-            "name": "oktopost/unitest",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Oktopost/Unitest.git",
-                "reference": "d5207e51d50a40b96894630e3169276d59d5482f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Oktopost/Unitest/zipball/d5207e51d50a40b96894630e3169276d59d5482f",
-                "reference": "d5207e51d50a40b96894630e3169276d59d5482f",
-                "shasum": ""
-            },
-            "require": {
-                "unstable-cacao/narrator": "^1.0.2"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Unitest\\": "Source/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Alexey Puchkov",
-                    "email": "alexey@oktopost.com",
-                    "role": "Developer"
-                }
-            ],
-            "homepage": "https://github.com/Oktopost/Unitest",
-            "time": "2018-06-07T06:39:41+00:00"
         },
         {
             "name": "symfony/process",
@@ -1714,16 +1714,16 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "e09160918c66281713f1c324c1f4c4c3037ba1e8"
+                "reference": "366541b989927187c4ca70490a35615d3fef2dce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/e09160918c66281713f1c324c1f4c4c3037ba1e8",
-                "reference": "e09160918c66281713f1c324c1f4c4c3037ba1e8",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/366541b989927187c4ca70490a35615d3fef2dce",
+                "reference": "366541b989927187c4ca70490a35615d3fef2dce",
                 "shasum": ""
             },
             "require": {
@@ -1766,7 +1766,7 @@
                 "unidiff",
                 "unified diff"
             ],
-            "time": "2018-02-01T13:45:15+00:00"
+            "time": "2018-06-10T07:54:39+00:00"
         },
         {
             "name": "sebastian/environment",

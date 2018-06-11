@@ -22,7 +22,7 @@
 	},
 	"require": 
 	{
-		"oktopost/unitest": "dev-master",
+		"oktopost/cosmic-ray": "^1.0",
 		"unstable-cacao/traitor": "^1.0",
 		"unstable-cacao/structura": "^1.0",
 		"oktopost/objection": "^1.0",
