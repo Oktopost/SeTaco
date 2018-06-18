@@ -61,6 +61,11 @@ class BrowserDecorator implements IBrowser
 		return $this;
 	}
 	
+	public function waitForElementToDisappear(string $cssSelector, float $timeout = 2.5): void
+	{
+		$this->use()->waitForElementToDisappear($cssSelector, $timeout);
+	}
+	
 	public function waitForElement(string $cssSelector, float $timeout = 2.5): void
 	{
 		$this->use()->waitForElement($cssSelector, $timeout);

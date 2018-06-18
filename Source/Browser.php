@@ -8,6 +8,7 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 
 use SeTaco\Exceptions\Element\ElementNotFoundException;
+use SeTaco\Exceptions\SeTacoException;
 
 
 class Browser implements IBrowser
@@ -69,6 +70,21 @@ class Browser implements IBrowser
 		}
 		
 		return $this;
+	}
+	
+	public function waitForElementToDisappear(string $cssSelector, float $timeout = 2.5): void
+	{
+		$endTime = microtime(true) + $timeout;
+		
+		while ($this->tryGetElement($cssSelector))
+		{
+			if (microtime(true) >= $endTime)
+			{
+				throw new SeTacoException("Element $cssSelector still exists after waiting for $timeout seconds");
+			}
+			
+			usleep(50000);
+		}
 	}
 	
 	public function waitForElement(string $cssSelector, float $timeout = 2.5): void
