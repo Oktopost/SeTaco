@@ -76,7 +76,7 @@ class Browser implements IBrowser
 	{
 		$endTime = microtime(true) + $timeout;
 		
-		while ($this->tryGetElement($cssSelector))
+		while ($this->tryGetElement($cssSelector, 0.0))
 		{
 			if (microtime(true) >= $endTime)
 			{
