@@ -51,7 +51,7 @@ class BrowserDecorator implements IBrowser
 	
 	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser
 	{
-		$this->use()->input($cssSelector, $timeout);
+		$this->use()->input($cssSelector, $value, $timeout);
 		return $this;
 	}
 	
