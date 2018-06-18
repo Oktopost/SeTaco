@@ -52,6 +52,19 @@ class Session implements ISession
 		return $decorator;
 	}
 	
+	public function closeUnusedBrowsers(): void
+	{
+		foreach ($this->browsers as $browser)
+		{
+			if ($this->current == $browser)
+				continue;
+			
+			$browser->destroy();
+		}
+		
+		$this->browsers = $this->hasCurrent() ? [$this->current] : [];
+	}
+	
 	public function config(): DriverConfig
 	{
 		return $this->config;
