@@ -68,7 +68,7 @@ class BrowserDecorator implements IBrowser
 	
 	public function hasElement(string $cssSelector, float $timeout = 2.5): bool
 	{
-		return $this->use()->tryGetElement($cssSelector, $timeout);
+		return $this->use()->hasElement($cssSelector, $timeout);
 	}
 	
 	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement
