@@ -101,16 +101,18 @@ class Browser implements IBrowser
 	{
 		try
 		{
+			$selector = ($cssSelector[0] == '/' ? 
+				WebDriverBy::xpath($cssSelector) :
+				WebDriverBy::cssSelector($cssSelector));
+			
 			if ($timeout > 0)
 			{
 				$this->driver
 					->wait((int)$timeout, ($timeout - floor($timeout)) * 1000)
-					->until(WebDriverExpectedCondition::presenceOfElementLocated(
-						WebDriverBy::cssSelector($cssSelector)
-					));
+					->until(WebDriverExpectedCondition::presenceOfElementLocated($selector));
 			}
 			
-			$element = $this->driver->findElement(WebDriverBy::cssSelector($cssSelector));
+			$element = $this->driver->findElement($selector);
 		}
 		catch (NoSuchElementException $e)
 		{
