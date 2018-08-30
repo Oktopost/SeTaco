@@ -20,7 +20,7 @@ class HomepageConfig extends LiteObject
 	{
 		return [
 			'Root'	=> LiteSetup::createString(null),
-			'URL'	=> LiteSetup::createString('http://localhost'),
+			'URL'	=> LiteSetup::createString(''),
 			'Port'	=> LiteSetup::createInt(80)
 		];
 	}
