@@ -7,6 +7,7 @@ use Objection\LiteSetup;
 
 
 /**
+ * @property string	$Root
  * @property string	$URL
  * @property int	$Port
  */
@@ -18,6 +19,7 @@ class HomepageConfig extends LiteObject
 	protected function _setup()
 	{
 		return [
+			'Root'	=> LiteSetup::createString(null),
 			'URL'	=> LiteSetup::createString('http://localhost'),
 			'Port'	=> LiteSetup::createInt(80)
 		];
@@ -29,7 +31,7 @@ class HomepageConfig extends LiteObject
 		if (substr($for, 0, 4) == 'http')
 			return $for;
 		
-		$url = $this->URL;
+		$url = ($this->Root ?: $this->URL);
 		
 		if ($for && $url && $url[strlen($url) - 1] != '/')
 			$url .= '/';

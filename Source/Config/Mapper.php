@@ -68,6 +68,10 @@ class Mapper implements IMapper
 		{
 			switch (strtolower($key))
 			{
+				case 'root':
+					$obj->Root = $value;
+					break;
+					
 				case 'port':
 					$obj->Port = (int)$value;
 					break;
