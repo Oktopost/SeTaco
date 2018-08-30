@@ -3,6 +3,7 @@
 namespace SeTaco\Decorators;
 
 
+use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 use SeTaco\IBrowser;
@@ -106,6 +107,14 @@ class BrowserDecorator implements IBrowser
 	public function destroy(): void
 	{
 		$this->child->destroy();
+	}
+	
+	/**
+	 * @return Cookie[]
+	 */
+	public function cookies(): array
+	{
+		return $this->use()->cookies();
 	}
 	
 	

@@ -2,6 +2,7 @@
 namespace SeTaco;
 
 
+use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -156,5 +157,13 @@ class Browser implements IBrowser
 		
 		$this->isDestroyed = true;
 		$this->driver->close();
+	}
+	
+	/**
+	 * @return Cookie[]
+	 */
+	public function cookies(): array
+	{
+		return $this->driver->manage()->getCookies();
 	}
 }

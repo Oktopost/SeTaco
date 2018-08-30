@@ -39,7 +39,7 @@ class HomepageConfig extends LiteObject
 		
 		$url = $url . $for;
 		
-		if ($this->Port != 80)
+		if ($url && $this->Port != 80)
 		{
 			$parts = parse_url($url);
 			

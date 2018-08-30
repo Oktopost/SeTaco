@@ -2,6 +2,7 @@
 namespace SeTaco;
 
 
+use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 
@@ -23,4 +24,9 @@ interface IBrowser
 	public function getURL(): string;
 	public function isDestroyed(): bool;
 	public function destroy(): void;
+	
+	/**
+	 * @return Cookie[]
+	 */
+	public function cookies(): array;
 }
