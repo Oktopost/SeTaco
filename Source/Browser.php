@@ -6,6 +6,7 @@ use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 
 use SeTaco\Exceptions\Element\ElementNotFoundException;
@@ -114,6 +115,10 @@ class Browser implements IBrowser
 			}
 			
 			$element = $this->driver->findElement($selector);
+		}
+		catch (TimeOutException $et)
+		{
+			throw new ElementNotFoundException($cssSelector);
 		}
 		catch (NoSuchElementException $e)
 		{
