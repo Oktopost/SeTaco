@@ -46,13 +46,26 @@ class BrowserAssert implements IBrowserAssert
 	}
 	
 	
-	public function URL(string $match): void
+	public function URL(string $match, float $timeout = 0.0): void
 	{
-		$target = $this->session->config()->Homepage->getURL($match);
 		$actual = $this->browser()->getURL();
+		$startTime = microtime(true);
 		
-		if ($target != $actual)
-			throw new Exception("Expected URL '$target' but got '$actual'");
+		while ($timeout >= 0)
+		{
+			if (fnmatch($match, $actual))
+				return;
+			
+			usleep(1000);
+			
+			$endTime = microtime(true);
+			$timeout -= $endTime - $startTime;
+			$startTime = $endTime;
+			
+			$actual = $this->browser()->getURL();
+		}
+		
+		throw new Exception("Expected URL to match '$match' but got '$actual'");
 	}
 	
 	
