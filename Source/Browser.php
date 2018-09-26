@@ -180,6 +180,29 @@ class Browser implements IBrowser
 	}
 	
 	/**
+	 * @param array|string $data If string, used as cookie name. 
+	 * @param null|string $value If $data is string and $value is null, delete the cookie.
+	 */
+	public function setCookie($data, ?string $value = null): void
+	{
+		if (is_string($data))
+		{
+			if (is_null($value))
+			{
+				$this->driver->manage()->deleteCookieNamed($data);
+			}
+			else
+			{
+				$this->driver->manage()->addCookie(['name' => $data, 'value' => $value]);
+			}
+		}
+		else
+		{
+			$this->driver->manage()->addCookie($data);
+		}
+	}
+	
+	/**
 	 * @return Cookie[]
 	 */
 	public function cookies(): array

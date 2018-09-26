@@ -129,6 +129,11 @@ class BrowserDecorator implements IBrowser
 		return $this->use()->cookies();
 	}
 	
+	public function setCookie($data, ?string $value = null): void
+	{
+		$this->use()->setCookie($data, $value);
+	}
+	
 	
 	public function setCallback($getSetCurrentCallback)
 	{

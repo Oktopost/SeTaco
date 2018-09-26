@@ -28,6 +28,12 @@ interface IBrowser
 	public function destroy(): void;
 	
 	/**
+	 * @param array|string $data If string, used as cookie name. 
+	 * @param null|string $value If $data is string and $value is null, delete the cookie.
+	 */
+	public function setCookie($data, ?string $value = null): void;
+	
+	/**
 	 * @return Cookie[]
 	 */
 	public function cookies(): array;
