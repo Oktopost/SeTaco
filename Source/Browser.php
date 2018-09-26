@@ -3,6 +3,7 @@ namespace SeTaco;
 
 
 use Facebook\WebDriver\Cookie;
+use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -51,6 +52,20 @@ class Browser implements IBrowser
 	{
 		$this->getElement($cssSelector, $timeout)->click();
 		return $this;
+	}
+	
+	public function hover(string $cssSelector, float $timeout = 2.5): IBrowser
+	{
+		$element = $this->getElement($cssSelector, $timeout);
+		$element->hover();
+		
+		return $this;
+	}
+	
+	public function hoverAndClick(string $cssSelector, float $timeout = 2.5): IBrowser
+	{
+		$this->hover($cssSelector, $timeout);
+		return $this->click($cssSelector);
 	}
 	
 	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser
@@ -125,7 +140,7 @@ class Browser implements IBrowser
 			throw new ElementNotFoundException($cssSelector);
 		}
 		
-		return new DomElement($element);
+		return new DomElement($element, $this->driver);
 	}
 	
 	public function tryGetElement(string $selector, float $secToWait = 2.5): ?IDomElement

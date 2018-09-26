@@ -19,8 +19,8 @@ class DriverConfigTest extends UnitestCase
 		self::assertEquals(OSType::ANY,						$object->Server->OS);
 		self::assertEquals('http://127.0.0.1:4444/wd/hub',	$object->Server->ServerURL);
 		
-		self::assertEquals(80,					$object->Homepage->Port);
-		self::assertEquals('http://localhost',	$object->Homepage->URL);
+		self::assertEquals(80, $object->Homepage->Port);
+		self::assertEquals('', $object->Homepage->URL);
 	}
 	
 	public function test_PassData_DataUsed()

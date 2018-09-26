@@ -50,6 +50,18 @@ class BrowserDecorator implements IBrowser
 		return $this;
 	}
 	
+	public function hover(string $cssSelector, float $timeout = 2.5): IBrowser
+	{
+		$this->use()->hover($cssSelector. $timeout);
+		return $this;
+	}
+	
+	public function hoverAndClick(string $cssSelector, float $timeout = 2.5): IBrowser
+	{
+		$this->use()->hoverAndClick($cssSelector, $timeout);
+		return $this;
+	}
+	
 	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser
 	{
 		$this->use()->input($cssSelector, $value, $timeout);

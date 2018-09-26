@@ -11,6 +11,8 @@ interface IBrowser
 	public function getRemoteWebDriver(): RemoteWebDriver;
 	public function goto(string $url): IBrowser;
 	public function click(string $cssSelector, float $timeout = 2.5): IBrowser;
+	public function hover(string $cssSelector, float $timeout = 2.5): IBrowser;
+	public function hoverAndClick(string $cssSelector, float $timeout = 2.5): IBrowser;
 	public function formInput(array $elements, ?string $submit = null, float $timeout = 2.5): IBrowser;
 	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser;
 	

@@ -37,9 +37,14 @@ class DomElementDecorator implements IDomElement
 		return $this->child->getRemoteWebElement();
 	}
 	
-	public function click(): void
+	public function click(bool $hover = false): void
 	{
-		$this->use()->click();
+		$this->use()->click($hover);
+	}
+	
+	public function hover(): void
+	{
+		$this->use()->hover();
 	}
 	
 	public function input(string $input): void
