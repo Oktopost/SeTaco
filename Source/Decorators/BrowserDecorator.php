@@ -52,7 +52,7 @@ class BrowserDecorator implements IBrowser
 	
 	public function hover(string $cssSelector, float $timeout = 2.5): IBrowser
 	{
-		$this->use()->hover($cssSelector. $timeout);
+		$this->use()->hover($cssSelector, $timeout);
 		return $this;
 	}
 	
