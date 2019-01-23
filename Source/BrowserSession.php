@@ -2,6 +2,7 @@
 namespace SeTaco;
 
 
+use SeTaco\Session\IOpenBrowserHandler;
 use SeTaco\Exceptions\SeTacoException;
 
 
@@ -12,6 +13,9 @@ class BrowserSession implements IBrowserSession
 	
 	/** @var Browser[] */
 	private $browsers = [];
+	
+	/** @var IOpenBrowserHandler */
+	private $handler;
 	
 	/** @var string|null */
 	private $current = null;
@@ -28,6 +32,11 @@ class BrowserSession implements IBrowserSession
 	}
 	
 	
+	public function setOpenBrowserHandler(IOpenBrowserHandler $handler): void
+	{
+		$this->handler = $handler;
+	}
+	
 	public function openBrowser(string $name): IBrowser
 	{
 		if (isset($this->browsers[$name]))
@@ -37,6 +46,11 @@ class BrowserSession implements IBrowserSession
 		
 		$driver = $this->config()->createDriver();
 		$browser = new Browser($driver, $this->config);
+		
+		if ($this->handler)
+		{
+			$this->handler->onOpened($browser);
+		}
 		
 		$this->current = $name;
 		$this->browsers[$name] = $browser;

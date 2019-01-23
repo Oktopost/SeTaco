@@ -2,8 +2,12 @@
 namespace SeTaco;
 
 
+use SeTaco\Session\IOpenBrowserHandler;
+
 interface IBrowserSession
 {
+	public function setOpenBrowserHandler(IOpenBrowserHandler $handler): void;
+	
 	public function openBrowser(string $name): IBrowser;
 	public function getBrowser(string $name): ?IBrowser;
 	public function hasBrowser(string $name): bool;
