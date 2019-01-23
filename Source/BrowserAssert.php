@@ -11,7 +11,7 @@ class BrowserAssert implements IBrowserAssert
 	/** @var IBrowser|null */
 	private $browser = null;
 	
-	/** @var ISession */
+	/** @var IBrowserSession */
 	private $session;
 	
 	
@@ -27,14 +27,14 @@ class BrowserAssert implements IBrowserAssert
 			$b = $this->session->current();
 		}
 		
-		if (is_null($b) || $b->isDestroyed())
+		if (is_null($b) || $b->isClosed())
 			throw new SeTacoException('No open browser to assert on found');
 		
 		return $b;
 	}
 	
 	
-	public function __construct(ISession $session)
+	public function __construct(IBrowserSession $session)
 	{
 		$this->session = $session;
 	}

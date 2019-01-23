@@ -2,7 +2,7 @@
 namespace SeTaco\Unit;
 
 
-use SeTaco\Session;
+use SeTaco\BrowserSession;
 use SeTaco\BrowserAssert;
 use SeTaco\DriverConfig;
 
@@ -16,9 +16,9 @@ class SessionTest extends UnitestCase
 		return DriverConfig::parse($data);
 	}
 	
-	public function subject(DriverConfig $config): Session
+	public function subject(DriverConfig $config): BrowserSession
 	{
-		return new Session($config);
+		return new BrowserSession($config);
 	}
 	
 	
@@ -29,12 +29,12 @@ class SessionTest extends UnitestCase
 	}
 	
 	
-	public function test_assert_AssertObjectReturned(Session $subject): void
+	public function test_assert_AssertObjectReturned(BrowserSession $subject): void
 	{
 		self::assertInstanceOf(BrowserAssert::class, $subject->assert());
 	}
 	
-	public function test_assert_SameObjectReturnedEachTime(Session $subject): void
+	public function test_assert_SameObjectReturnedEachTime(BrowserSession $subject): void
 	{
 		self::assertSame($subject->assert(), $subject->assert());
 	}

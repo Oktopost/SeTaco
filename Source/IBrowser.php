@@ -24,8 +24,8 @@ interface IBrowser
 	
 	public function getTitle(): string;
 	public function getURL(): string;
-	public function isDestroyed(): bool;
-	public function destroy(): void;
+	public function isClosed(): bool;
+	public function close(): void;
 	
 	/**
 	 * @param array|string $data If string, used as cookie name. 

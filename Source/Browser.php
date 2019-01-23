@@ -16,7 +16,7 @@ use SeTaco\Exceptions\SeTacoException;
 
 class Browser implements IBrowser
 {
-	private $isDestroyed = false;
+	private $isClosed = false;
 	
 	/** @var RemoteWebDriver */
 	private $driver;
@@ -33,7 +33,7 @@ class Browser implements IBrowser
 	
 	public function __destruct()
 	{
-		$this->destroy();
+		$this->close();
 	}
 	
 	
@@ -165,17 +165,17 @@ class Browser implements IBrowser
 		return $this->driver->getCurrentURL();
 	}
 	
-	public function isDestroyed(): bool
+	public function isClosed(): bool
 	{
-		return $this->isDestroyed;
+		return $this->isClosed;
 	}
 	
-	public function destroy(): void
+	public function close(): void
 	{
-		if ($this->isDestroyed)
+		if ($this->isClosed)
 			return;
 		
-		$this->isDestroyed = true;
+		$this->isClosed = true;
 		$this->driver->close();
 	}
 	
