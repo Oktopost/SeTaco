@@ -38,9 +38,6 @@
 		"post-install-cmd": [
 			"SeTaco\\Downloads\\ComposerUtils::composerPostInstallHook"
 		],
-		"post-package-install": [
-			"SeTaco\\Downloads\\ComposerUtils::composerPostPackageInstallHook"
-		],
 		"selenium": "java -Dwebdriver.chrome.driver=\"vendor/bin/chromedriver\" -jar vendor/bin/selenium.jar",
         "test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests",
         "unit-test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --group unit",

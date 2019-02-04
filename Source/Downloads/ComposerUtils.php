@@ -66,11 +66,4 @@ class ComposerUtils
 		self::downloadSelenium($path);
 		self::downloadChromeDriver($path);
 	}
-	
-	public static function composerPostPackageInstallHook(Event $event): void
-	{
-		$path = self::getBinDirPath($event);
-		self::downloadSelenium($path);
-		self::downloadChromeDriver($path);
-	}
 }
