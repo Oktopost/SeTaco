@@ -26,22 +26,21 @@ class BrowserSession implements IBrowserSession
 	private $browsers = [];
 	
 	
-	private function getTarget(string $targetName): ?TargetConfig
-	{
-		return $this->hasTarget($targetName) ? $this->config->Targets[$targetName] : null;
-	}
-	
 	private function hasTarget(string $targetName): bool
 	{
 		return isset($this->config->Targets[$targetName]);
 	}
 	
-	private function openBrowser(string $name, TargetConfig $targetConfig): IBrowser
+	private function getTarget(string $targetName): ?TargetConfig
 	{
-		if ($this->hasBrowser($name))
+		return $this->hasTarget($targetName) ? $this->config->Targets[$targetName] : null;
+	}
+	
+	private function openBrowser(string $browserName, TargetConfig $targetConfig): IBrowser
+	{
+		if ($this->hasBrowser($browserName))
 		{
-			$this->getBrowser($name)->close();
-			unset($this->browsers[$name]);
+			$this->close($browserName);
 		}
 		
 		$driver = $this->config()->createDriver();
@@ -51,20 +50,20 @@ class BrowserSession implements IBrowserSession
 		if ($this->handler)
 			$this->handler->onOpened($browser);
 		
-		$this->browsers[$name] = $browser;
+		$this->browsers[$browserName] = $browser;
 		$this->current = $browser;
 		
 		return $browser;
 	}
 	
-	private function openBrowserFromURL(string $url, string $name): IBrowser
+	private function openBrowserForURL(string $url, string $browserName): IBrowser
 	{
 		$parsedUrl = new URL($url);
 		
 		if (!$parsedUrl->Scheme)
 		{
 			if ($this->current)
-				return $this->current->goto($url);
+				return $this->current->goto($parsedUrl->url());
 			
 			throw new SeTacoException('Failed to parse target and no current browser is selected');
 		}
@@ -75,7 +74,7 @@ class BrowserSession implements IBrowserSession
 		if ($parsedUrl->Port)
 			$targetConfig->Port = $parsedUrl->Port;
 		
-		$browser = $this->openBrowser($name, $targetConfig);
+		$browser = $this->openBrowser($browserName, $targetConfig);
 		
 		return $browser->goto($parsedUrl->url());
 	}
@@ -102,14 +101,14 @@ class BrowserSession implements IBrowserSession
 		if (!$browserName)
 			$browserName = self::DEFAULT_BROWSER_NAME;
 		
-		if (!$this->hasTarget($target))
-			return $this->openBrowserFromURL($target, $browserName);
-		
 		if ($this->hasBrowser($browserName))
 		{
 			$this->close($browserName);
 			return $this->open($target, $browserName);
 		}
+		
+		if (!$this->hasTarget($target))
+			return $this->openBrowserForURL($target, $browserName);
 		
 		$target = $this->getTarget($target);
 		
