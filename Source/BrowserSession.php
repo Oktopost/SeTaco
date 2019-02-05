@@ -22,60 +22,37 @@ class BrowserSession implements IBrowserSession
 	/** @var IBrowser|null */
 	private $current = null;
 	
-	/** @var BrowserSessionContainer[]  */
-	private $containers = [];
+	/** @var IBrowser[] */
+	private $browsers = [];
 	
 	
-	private function createOrGetContainer(string $name, TargetConfig $targetConfig): BrowserSessionContainer
+	private function getTarget(string $targetName): ?TargetConfig
 	{
-		if (!isset($this->containers[$name]))
-			$this->containers[$name] = new BrowserSessionContainer();
-		
-		$this->containers[$name]->TargetConfig = $targetConfig;
-		
-		return $this->containers[$name];
+		return $this->hasTarget($targetName) ? $this->config->Targets[$targetName] : null;
 	}
 	
-	private function getContainerNames(): array
+	private function hasTarget(string $targetName): bool
 	{
-		return array_keys($this->containers);
+		return isset($this->config->Targets[$targetName]);
 	}
 	
-	private function prepareContainers(): void
+	private function openBrowser(string $name, TargetConfig $targetConfig): IBrowser
 	{
-		foreach ($this->config->Targets as $targetName => $target)
+		if ($this->hasBrowser($name))
 		{
-			$this->createOrGetContainer($targetName, $target);
-		}
-	}
-	
-	private function hasContainer(string $name): bool
-	{
-		return isset($this->containers[$name]);
-	}
-	
-	private function getContainer(string $name): ?BrowserSessionContainer
-	{
-		return $this->hasContainer($name) ? $this->containers[$name] : null;
-	}
-	
-	private function openBrowser(BrowserSessionContainer $container, string $name): IBrowser
-	{
-		if ($container->hasBrowser($name))
-		{
-			$container->getBrowser($name)->close();
-			unset($container->Browsers[$name]);
+			$this->getBrowser($name)->close();
+			unset($this->browsers[$name]);
 		}
 		
 		$driver = $this->config()->createDriver();
 		
-		$browser = new Browser($driver, $container->TargetConfig);
+		$browser = new Browser($driver, $targetConfig);
 		
 		if ($this->handler)
 			$this->handler->onOpened($browser);
 		
-		$this->current = $name;
-		$container->Current = $browser;
+		$this->browsers[$name] = $browser;
+		$this->current = $browser;
 		
 		return $browser;
 	}
@@ -98,10 +75,7 @@ class BrowserSession implements IBrowserSession
 		if ($parsedUrl->Port)
 			$targetConfig->Port = $parsedUrl->Port;
 		
-		$container = $this->createOrGetContainer($targetConfig->URL, $targetConfig);
-		$container->TargetConfig = $targetConfig;
-		
-		$browser = $this->openBrowser($container, $name);
+		$browser = $this->openBrowser($name, $targetConfig);
 		
 		return $browser->goto($parsedUrl->url());
 	}
@@ -110,7 +84,6 @@ class BrowserSession implements IBrowserSession
 	public function __construct(DriverConfig $config)
 	{
 		$this->config = $config;
-		$this->prepareContainers();
 	}
 	
 	public function __destruct()
@@ -129,143 +102,96 @@ class BrowserSession implements IBrowserSession
 		if (!$browserName)
 			$browserName = self::DEFAULT_BROWSER_NAME;
 		
-		if (!$this->hasContainer($target))
+		if (!$this->hasTarget($target))
 			return $this->openBrowserFromURL($target, $browserName);
 		
-		$container = $this->getContainer($target);
-		
-		if ($container->hasBrowser($browserName))
+		if ($this->hasBrowser($browserName))
 		{
-			$this->close($target, $browserName);
+			$this->close($browserName);
 			return $this->open($target, $browserName);
 		}
 		
-		return $this->openBrowser($container, $browserName)->goto($container->TargetConfig->URL);
+		$target = $this->getTarget($target);
+		
+		return $this->openBrowser($browserName, $target)->goto($target->URL);
 	}
 	
-	public function getBrowser(string $targetName, ?string $browserName = null): ?IBrowser
+	public function getBrowser(string $browserName): ?IBrowser
 	{
-		$container = $this->getContainer($targetName);
-		
-		if (!$container)
+		if (!$this->hasBrowser($browserName))
 			return null;
-		
-		if ($browserName)
-		{
-			return $container->hasBrowser($browserName) ? $container->getBrowser($browserName) : null;
-		}
-		
-		return $container->Current;
-	}
-	
-	public function hasBrowser(string $targetName, ?string $browserName = null): bool
-	{
-		$container = $this->getContainer($targetName);
-		
-		if (!$container)
-			return false;
-		
-		return $browserName ? $container->hasBrowser($browserName) : $container->hasBrowsers();
-	}
-	
-	public function hasBrowsers(?string $targetName = null): bool
-	{
-		if (!$targetName)
-		{
-			foreach ($this->getContainerNames() as $containerName)
-			{
-				if ($this->hasBrowsers($containerName))
-					return true;
-			}
-			
-			return false;
-		}
-		
-		return $this->getContainer($targetName)->hasBrowsers();
-	}
-	
-	public function current(?string $targetName = null): ?IBrowser
-	{
-		if ($targetName)
-			return $this->getContainer($targetName)->Current;
+
+		$this->current = $this->browsers[$browserName];
 		
 		return $this->current;
 	}
 	
-	public function select(string $targetName, ?string $browserName = null): IBrowser
+	public function hasBrowser(string $browserName): bool
 	{
-		$container = $this->getContainer($targetName);
-		$browser = $container->Browsers[$browserName] ?? null;
+		return isset($this->browsers[$browserName]) && !$this->browsers[$browserName]->isClosed();
+	}
+	
+	public function hasBrowsers(): bool
+	{
+		return (bool)$this->browsers;
+	}
+	
+	public function current(): ?IBrowser
+	{
+		return $this->current;
+	}
+	
+	public function select(string $browserName): IBrowser
+	{
+		$browser = $this->getBrowser($browserName);
 		
 		if (!$browser || $browser->isClosed())
 		{
-			unset($container->Browsers[$browserName]);
+			unset($this->browsers[$browserName]);
 			throw new SeTacoException("Browser with name '$browserName' does not exist in this session!");
 		}
 		
 		$this->current = $browser;
-		$container->Current = $browser;
 		
 		return $browser;
 	}
 	
-	public function closeUnused(?string $targetName = null): void
+	public function closeUnused(): void
 	{
-		if (!$targetName)
-		{
-			foreach ($this->getContainerNames() as $container)
-			{
-				$this->closeUnused($container);
-			}
-			
-			return;
-		}
-		
-		$container = $this->getContainer($targetName);
-		
-		foreach ($container->Browsers as $browsername => $browser)
+		foreach ($this->browsers as $browserName => $browser)
 		{
 			/** @noinspection PhpNonStrictObjectEqualityInspection */
-			if ($browser != $container->Current)
+			if ($browser != $this->current)
+			{
 				$browser->close();
+				unset($this->browsers[$browserName]);
+			}
 		}
 	}
 	
-	public function close(?string $targetName = null, ?string $browserName = null): void
+	public function close(?string $browserName = null): void
 	{
-		if (!$targetName)
+		if(!$browserName)
 		{
-			foreach ($this->getContainerNames() as $targetName)
+			foreach ($this->browsers as $browserName => $browser)
 			{
-				$this->close($targetName, $browserName);
+				$this->close($browserName);
 			}
 			
 			return;
 		}
 		
-		$container = $this->getContainer($targetName);
+		if(!$this->hasBrowser($browserName))
+			return;
 		
-		if ($browserName && isset($container->Browsers[$browserName]))
-		{
-			$browser = $container->Browsers[$browserName];
-			
-			/** @noinspection PhpNonStrictObjectEqualityInspection */
-			if ($browser == $container->Current)
-				unset($container->Current);
-			
-			$browser->close();
-			unset($container->Browsers[$browserName]);
-		}
-		else if (!$browserName)
-		{
-			foreach ($container->Browsers as $browserName => $browser)
-			{
-				$browser->close();
-				unset($container->Browsers[$browserName]);
-			}
-			
-			unset($container->Current);
-		}
+		$browser = $this->getBrowser($browserName);
+		
+		/** @noinspection PhpNonStrictObjectEqualityInspection */
+		if ($browser == $this->current)
+			unset($this->current);
+		
+		$browser->close();
+		unset($this->browsers[$browserName]);
 	}
 	
 	public function config(): DriverConfig

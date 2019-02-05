@@ -27,8 +27,10 @@ class TargetConfig extends LiteObject
 	
 	public function getURL(string $for): string
 	{
-		if ((new URL($for))->Scheme)
-			return $for;
+		$forURL = new URL($for);
+		
+		if ($forURL->Scheme)
+			return $forURL->url();
 		
 		$parsed = new URL($this->URL);
 		
