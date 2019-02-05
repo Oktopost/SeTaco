@@ -152,15 +152,20 @@ class BrowserSession implements IBrowserSession
 		
 		if ($browserName)
 		{
-			return isset($container->Browsers[$browserName]) ? $container->Browsers[$browserName] : null;
+			return $container->hasBrowser($browserName) ? $container->getBrowser($browserName) : null;
 		}
 		
 		return $container->Current;
 	}
 	
-	public function hasBrowser(string $targetName, string $browserName = null): bool
+	public function hasBrowser(string $targetName, ?string $browserName = null): bool
 	{
-		return isset($this->getContainer($targetName)->Browsers[$browserName]);
+		$container = $this->getContainer($targetName);
+		
+		if (!$container)
+			return false;
+		
+		return $browserName ? $container->hasBrowser($browserName) : $container->hasBrowsers();
 	}
 	
 	public function hasBrowsers(?string $targetName = null): bool

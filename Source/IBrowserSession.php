@@ -11,7 +11,7 @@ interface IBrowserSession
 	public function open(string $target, ?string $browserName = null): IBrowser;
 	public function getBrowser(string $targetName, ?string $browserName = null): ?IBrowser;
 	
-	public function hasBrowser(string $targetName, string $browserName = null): bool;
+	public function hasBrowser(string $targetName, ?string $browserName = null): bool;
 	public function hasBrowsers(?string $targetName = null): bool;
 	
 	public function current(?string $targetName = null): ?IBrowser;
