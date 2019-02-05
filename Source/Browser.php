@@ -3,13 +3,13 @@ namespace SeTaco;
 
 
 use Facebook\WebDriver\Cookie;
-use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 
+use SeTaco\Config\TargetConfig;
 use SeTaco\Exceptions\Element\ElementNotFoundException;
 use SeTaco\Exceptions\SeTacoException;
 
@@ -21,14 +21,14 @@ class Browser implements IBrowser
 	/** @var RemoteWebDriver */
 	private $driver;
 	
-	/** @var DriverConfig */
-	private $config;
+	/** @var TargetConfig */
+	private $targetConfig;
 	
 	
-	public function __construct(RemoteWebDriver $driver, DriverConfig $config)
+	public function __construct(RemoteWebDriver $driver, TargetConfig $config)
 	{
 		$this->driver = $driver;
-		$this->config = $config;
+		$this->targetConfig = $config;
 	}
 	
 	public function __destruct()
@@ -44,7 +44,7 @@ class Browser implements IBrowser
 	
 	public function goto(string $url): IBrowser
 	{
-		$this->driver->navigate()->to($this->config->Homepage->getURL($url));
+		$this->driver->navigate()->to($this->targetConfig->getURL($url));
 		return $this;
 	}
 	

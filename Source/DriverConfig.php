@@ -8,13 +8,13 @@ use Objection\LiteSetup;
 use Objection\LiteObject;
 
 use SeTaco\Config\Mapper;
-use SeTaco\Config\ServerSetup;
-use SeTaco\Config\HomepageConfig;
+use SeTaco\Config\ServerConfig;
+use SeTaco\Config\TargetConfig;
 
 
 /**
- * @property ServerSetup	$Server
- * @property HomepageConfig	$Homepage
+ * @property ServerConfig	$Server
+ * @property TargetConfig[]	$Targets
  */
 class DriverConfig extends LiteObject
 {
@@ -24,14 +24,19 @@ class DriverConfig extends LiteObject
 	protected function _setup()
 	{
 		return [
-			'Server'	=> LiteSetup::createInstanceOf(ServerSetup::class),
-			'Homepage'	=> LiteSetup::createInstanceOf(HomepageConfig::class)
+			'Server'	=> LiteSetup::createInstanceOf(ServerConfig::class),
+			'Targets'	=> LiteSetup::createInstanceArray(TargetConfig::class)
 		];
 	}
 	
 	
 	public function createDriver(): RemoteWebDriver
 	{
+		if (!$this->Server)
+		{
+			$this->Server = new ServerConfig();
+		}
+		
 		return $this->Server->createDriver();
 	}
 	

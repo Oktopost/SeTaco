@@ -28,11 +28,11 @@ class Mapper implements IMapper
 	/**
 	 * @map
 	 * @param array $data
-	 * @return ServerSetup
+	 * @return ServerConfig
 	 */
-	public static function mapServerSetup(array $data): ServerSetup 
+	public static function mapServerConfig(array $data): ServerConfig 
 	{
-		$obj = new ServerSetup();
+		$obj = new ServerConfig();
 		
 		foreach ($data as $key => $value)
 		{
@@ -58,20 +58,16 @@ class Mapper implements IMapper
 	/**
 	 * @map
 	 * @param array $data
-	 * @return HomepageConfig
+	 * @return TargetConfig
 	 */
-	public static function mapHomepageConfig(array $data): HomepageConfig 
+	public static function mapTargetConfig(array $data): TargetConfig 
 	{
-		$obj = new HomepageConfig();
+		$obj = new TargetConfig();
 		
 		foreach ($data as $key => $value)
 		{
 			switch (strtolower($key))
 			{
-				case 'root':
-					$obj->Root = $value;
-					break;
-					
 				case 'port':
 					$obj->Port = (int)$value;
 					break;
@@ -97,18 +93,22 @@ class Mapper implements IMapper
 		
 		foreach ($data as $key => $value)
 		{
-			if (strtolower($key) == 'homepage')
+			if (strtolower($key) == 'targets')
 			{
-				$object->Homepage = $c->map()->from($value)->into(HomepageConfig::class);
+				foreach ($value as $targetName => $targetData)
+				{
+					$target = $c->map()->from($targetData)->into(TargetConfig::class);
+					$object->Targets[$targetName] = $target;
+				}
 			}
 			else if (strtolower($key) == 'server')
 			{
-				$object->Server = $c->map()->from($value)->into(ServerSetup::class);
+				$object->Server = $c->map()->from($value)->into(ServerConfig::class);
 			}
 		}
 		
-		if ($object->Homepage == null) $object->Homepage = new HomepageConfig();
-		if ($object->Server == null) $object->Server = new ServerSetup();
+		if (!$object->Targets) $object->Targets = ['default' => new TargetConfig()];
+		if (!$object->Server) $object->Server = new ServerConfig();
 		
 		return $object;
 	}

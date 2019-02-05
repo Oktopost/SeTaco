@@ -18,7 +18,7 @@ use SeTaco\BrowserType;
  * @property string $Browser
  * @property string $ServerURL
  */
-class ServerSetup extends LiteObject
+class ServerConfig extends LiteObject
 {
 	/**
 	 * @return array

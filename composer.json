@@ -10,6 +10,11 @@
 			"name": "Alexey Puchkov",
 			"email": "alexey@oktopost.com",
 			"role": "Developer"
+		},
+		{
+			"name": "Daniel Podrabinek",
+			"email": "dpodrabinek@oktopost.com",
+			"role": "Developer"
 		}
 	],
 	"minimum-stability": "stable",
@@ -23,7 +28,7 @@
 	"require": 
 	{
 		"unstable-cacao/traitor": "^1.0",
-		"unstable-cacao/structura": "^1.0",
+		"unstable-cacao/structura": "^2.0.2",
 		"oktopost/objection": "^1.0",
 		"facebook/webdriver": "^1.6",
 		"oktopost/cartograph": "^1.1"
@@ -45,5 +50,8 @@
         "test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover",
         "unit-test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover --group unit",
         "integration-test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover --group integration"
-    }
+    },
+	"config": {
+		"process-timeout": 0
+	}
 }

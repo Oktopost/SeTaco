@@ -31,7 +31,7 @@ class ComposerUtils
 	
 	private static function downloadSelenium(string $binPath): void
 	{
-		echo "Downloading Selenium\n";
+		echo "\n\nDownloading Selenium\n";
 		$url = self::SELENIUM_URL;
 		$filename = $binPath . '/selenium.jar';
 		shell_exec("curl " . $url . " -o " . $filename);
@@ -51,7 +51,7 @@ class ComposerUtils
 				throw new \Exception('Failed to download chrome driver for current OS');
 		}
 		
-		echo "Downloading ChromeDriver\n";
+		echo "\n\nDownloading ChromeDriver\n";
 		
 		$filename = $binPath . '/chrome.zip';
 		shell_exec("curl " . $url . " -o " . $filename);
