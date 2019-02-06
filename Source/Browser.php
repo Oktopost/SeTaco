@@ -3,32 +3,29 @@ namespace SeTaco;
 
 
 use Facebook\WebDriver\Cookie;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\TimeOutException;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\Exception\TimeOutException;
-use Facebook\WebDriver\Exception\NoSuchElementException;
 
 use SeTaco\Config\TargetConfig;
-use SeTaco\Exceptions\Element\ElementNotFoundException;
-use SeTaco\Exceptions\SeTacoException;
+use SeTaco\Exceptions\Browser\URLCompareException;
+use SeTaco\Exceptions\Browser\Element\ElementExistsException;
+use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
 
 
 class Browser implements IBrowser
 {
 	private $isClosed = false;
 	
-	/** @var RemoteWebDriver */
-	private $driver;
-	
-	/** @var TargetConfig */
-	private $targetConfig;
+	/** @var BrowserSetup */
+	private $config;
 	
 	
-	public function __construct(RemoteWebDriver $driver, TargetConfig $config)
+	public function __construct(BrowserSetup $config)
 	{
-		$this->driver = $driver;
-		$this->targetConfig = $config;
+		$this->config = $config;
 	}
 	
 	public function __destruct()
@@ -39,12 +36,27 @@ class Browser implements IBrowser
 	
 	public function getRemoteWebDriver(): RemoteWebDriver
 	{
-		return $this->driver;
+		return $this->config->RemoteWebDriver;
+	}
+	
+	public function getTargetName(): ?string
+	{
+		return $this->config->TargetName;
+	}
+	
+	public function getTargetConfig(): TargetConfig
+	{
+		return $this->config->TargetConfig;
+	}
+	
+	public function getBrowserName(): string
+	{
+		return $this->config->BrowserName;
 	}
 	
 	public function goto(string $url): IBrowser
 	{
-		$this->driver->navigate()->to($this->targetConfig->getURL($url));
+		$this->getRemoteWebDriver()->navigate()->to($this->getTargetConfig()->getURL($url));
 		return $this;
 	}
 	
@@ -97,7 +109,7 @@ class Browser implements IBrowser
 		{
 			if (microtime(true) >= $endTime)
 			{
-				throw new SeTacoException("Element $cssSelector still exists after waiting for $timeout seconds");
+				throw new ElementExistsException($cssSelector, $timeout);
 			}
 			
 			usleep(50000);
@@ -124,12 +136,12 @@ class Browser implements IBrowser
 			
 			if ($timeout > 0)
 			{
-				$this->driver
+				$this->getRemoteWebDriver()
 					->wait((int)$timeout, ($timeout - floor($timeout)) * 1000)
 					->until(WebDriverExpectedCondition::presenceOfElementLocated($selector));
 			}
 			
-			$element = $this->driver->findElement($selector);
+			$element = $this->getRemoteWebDriver()->findElement($selector);
 		}
 		catch (TimeOutException $et)
 		{
@@ -140,7 +152,7 @@ class Browser implements IBrowser
 			throw new ElementNotFoundException($cssSelector);
 		}
 		
-		return new DomElement($element, $this->driver);
+		return new DomElement($element, $this->getRemoteWebDriver());
 	}
 	
 	public function tryGetElement(string $selector, float $secToWait = 2.5): ?IDomElement
@@ -155,14 +167,47 @@ class Browser implements IBrowser
 		}
 	}
 	
+	public function compareURL(string $url): bool
+	{
+		$currentURL = $this->getURL();
+		
+		if ($currentURL == $url)
+			return true;
+		
+		$pattern = '/' . str_replace('/', '\\/', $url) . '/';
+		
+		return preg_match($pattern, $currentURL);
+	}
+	
+	public function waitForURL(string $url, float $timeout = 2.5): void
+	{
+		$endTime = microtime(true) + $timeout;
+		
+		while (!$this->compareURL($this))
+		{
+			if (microtime(true) >= $endTime)
+			{
+				$currentUrl = $this->getURL();
+				throw new URLCompareException($url, $currentUrl, $timeout);
+			}
+			
+			usleep(50000);
+		}
+	}
+	
 	public function getTitle(): string
 	{
-		return $this->driver->getTitle();
+		return $this->getRemoteWebDriver()->getTitle();
 	}
 	
 	public function getURL(): string
 	{
-		return $this->driver->getCurrentURL();
+		return $this->getRemoteWebDriver()->getCurrentURL();
+	}
+	
+	public function refresh(): void
+	{
+		$this->getRemoteWebDriver()->navigate()->refresh();
 	}
 	
 	public function isClosed(): bool
@@ -176,7 +221,7 @@ class Browser implements IBrowser
 			return;
 		
 		$this->isClosed = true;
-		$this->driver->close();
+		$this->getRemoteWebDriver()->close();
 	}
 	
 	/**
@@ -189,16 +234,16 @@ class Browser implements IBrowser
 		{
 			if (is_null($value))
 			{
-				$this->driver->manage()->deleteCookieNamed($data);
+				$this->getRemoteWebDriver()->manage()->deleteCookieNamed($data);
 			}
 			else
 			{
-				$this->driver->manage()->addCookie(['name' => $data, 'value' => $value]);
+				$this->getRemoteWebDriver()->manage()->addCookie(['name' => $data, 'value' => $value]);
 			}
 		}
 		else
 		{
-			$this->driver->manage()->addCookie($data);
+			$this->getRemoteWebDriver()->manage()->addCookie($data);
 		}
 	}
 	
@@ -207,6 +252,6 @@ class Browser implements IBrowser
 	 */
 	public function cookies(): array
 	{
-		return $this->driver->manage()->getCookies();
+		return $this->getRemoteWebDriver()->manage()->getCookies();
 	}
 }

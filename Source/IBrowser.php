@@ -4,11 +4,15 @@ namespace SeTaco;
 
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use SeTaco\Config\TargetConfig;
 
 
 interface IBrowser
 {
 	public function getRemoteWebDriver(): RemoteWebDriver;
+	public function getTargetName(): ?string;
+	public function getTargetConfig(): TargetConfig;
+	public function getBrowserName(): string;
 	public function goto(string $url): IBrowser;
 	public function click(string $cssSelector, float $timeout = 2.5): IBrowser;
 	public function hover(string $cssSelector, float $timeout = 2.5): IBrowser;
@@ -21,9 +25,12 @@ interface IBrowser
 	public function hasElement(string $cssSelector, float $timeout = 2.5): bool;
 	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement;
 	public function tryGetElement(string $selector, float $secToWait = 2.5): ?IDomElement;
+	public function compareURL(string $url): bool;
+	public function waitForURL(string $url, float $timeout = 2.5): void;
 	
 	public function getTitle(): string;
 	public function getURL(): string;
+	public function refresh(): void;
 	public function isClosed(): bool;
 	public function close(): void;
 	

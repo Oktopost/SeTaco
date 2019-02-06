@@ -4,6 +4,7 @@ namespace SeTaco;
 
 use SeTaco\Session\IOpenBrowserHandler;
 
+
 interface IBrowserSession
 {
 	public function setOpenBrowserHandler(IOpenBrowserHandler $handler): void;
@@ -15,7 +16,12 @@ interface IBrowserSession
 	public function hasBrowsers(): bool;
 	
 	public function current(): ?IBrowser;
-	public function select(string $browserName): IBrowser;
+	
+	/**
+	 * @param string|IBrowser $browserName
+	 * @return IBrowser
+	 */
+	public function select($browserName): IBrowser;
 	
 	public function closeUnused(): void;
 	public function close(?string $browserName = null): void;

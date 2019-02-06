@@ -1,11 +1,8 @@
 <?php
-namespace SeTaco\Exceptions\Element;
+namespace SeTaco\Exceptions\Browser\Element;
 
 
-use SeTaco\Exceptions\SeTacoException;
-
-
-class MissingAttributeException extends SeTacoException
+class MissingAttributeException extends ElementException
 {
 	public function __construct($attrName)
 	{

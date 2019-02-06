@@ -36,7 +36,7 @@ class BrowserSession implements IBrowserSession
 		return $this->hasTarget($targetName) ? $this->config->Targets[$targetName] : null;
 	}
 	
-	private function openBrowser(string $browserName, TargetConfig $targetConfig): IBrowser
+	private function openBrowser(string $browserName, TargetConfig $targetConfig, ?string $targetName = null): IBrowser
 	{
 		if ($this->hasBrowser($browserName))
 		{
@@ -45,7 +45,13 @@ class BrowserSession implements IBrowserSession
 		
 		$driver = $this->config()->createDriver();
 		
-		$browser = new Browser($driver, $targetConfig);
+		$setup = new BrowserSetup();
+		$setup->RemoteWebDriver = $driver;
+		$setup->TargetConfig = $targetConfig;
+		$setup->TargetName = $targetName;
+		$setup->BrowserName = $browserName;
+		
+		$browser = new Browser($setup);
 		
 		if ($this->handler)
 			$this->handler->onOpened($browser);
@@ -110,9 +116,9 @@ class BrowserSession implements IBrowserSession
 		if (!$this->hasTarget($target))
 			return $this->openBrowserForURL($target, $browserName);
 		
-		$target = $this->getTarget($target);
+		$targetConfig = $this->getTarget($target);
 		
-		return $this->openBrowser($browserName, $target)->goto($target->URL);
+		return $this->openBrowser($browserName, $targetConfig, $target)->goto($targetConfig->URL);
 	}
 	
 	public function getBrowser(string $browserName): ?IBrowser
@@ -140,9 +146,21 @@ class BrowserSession implements IBrowserSession
 		return $this->current;
 	}
 	
-	public function select(string $browserName): IBrowser
+	/**
+	 * @param string|IBrowser $browserName
+	 * @return IBrowser
+	 */
+	public function select($browserName): IBrowser
 	{
-		$browser = $this->getBrowser($browserName);
+		if ($browserName instanceof IBrowser)
+		{
+			$browser = $browserName;
+			$browserName = $browser->getBrowserName();
+		}
+		else
+		{
+			$browser = $this->getBrowser($browserName);
+		}
 		
 		if (!$browser || $browser->isClosed())
 		{

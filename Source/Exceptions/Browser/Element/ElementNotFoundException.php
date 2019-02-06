@@ -1,11 +1,9 @@
 <?php
-namespace SeTaco\Exceptions\Element;
+namespace SeTaco\Exceptions\Browser\Element;
 
 
-use SeTaco\Exceptions\SeTacoException;
 
-
-class ElementNotFoundException extends SeTacoException
+class ElementNotFoundException extends ElementException
 {
 	public function __construct($cssSelector)
 	{
