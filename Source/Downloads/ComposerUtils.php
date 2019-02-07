@@ -55,7 +55,7 @@ class ComposerUtils
 		
 		$filename = $binPath . '/chrome.zip';
 		shell_exec("curl " . $url . " -o " . $filename);
-		shell_exec("unzip -f " . $filename . ' -d ' . $binPath);
+		shell_exec("unzip -u " . $filename . ' -d ' . $binPath);
 		shell_exec("rm " . $filename);
 	}
 	
