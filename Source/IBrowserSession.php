@@ -24,7 +24,7 @@ interface IBrowserSession
 	public function select($browserName): IBrowser;
 	
 	public function closeUnused(): void;
-	public function close(?string $browserName = null): void;
+	public function close($browserName = null): void;
 	
 	public function config(): DriverConfig;
 }

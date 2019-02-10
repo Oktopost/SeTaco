@@ -186,7 +186,7 @@ class BrowserSession implements IBrowserSession
 		}
 	}
 	
-	public function close(?string $browserName = null): void
+	public function close($browserName = null): void
 	{
 		if(!$browserName)
 		{
@@ -198,10 +198,19 @@ class BrowserSession implements IBrowserSession
 			return;
 		}
 		
-		if(!$this->hasBrowser($browserName))
-			return;
 		
-		$browser = $this->getBrowser($browserName);
+		if ($browserName instanceof IBrowser)
+		{
+			$browser = $browserName;
+			$browserName = $browser->getBrowserName();
+		}
+		else
+		{
+			if(!$this->hasBrowser($browserName))
+				return;
+			
+			$browser = $this->getBrowser($browserName);
+		}
 		
 		/** @noinspection PhpNonStrictObjectEqualityInspection */
 		if ($browser == $this->current)
