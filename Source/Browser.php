@@ -183,7 +183,7 @@ class Browser implements IBrowser
 	{
 		$endTime = microtime(true) + $timeout;
 		
-		while (!$this->compareURL($this))
+		while (!$this->compareURL($url))
 		{
 			if (microtime(true) >= $endTime)
 			{
