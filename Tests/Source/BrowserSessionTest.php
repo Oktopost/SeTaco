@@ -26,13 +26,13 @@ class BrowserSessionTest extends TestCase
 		];
 	}
 	
-	private function getDriverConfig(): DriverConfig
+	private function getDriverConfig(): TacoConfig
 	{
 		if ($this->driverConfig)
 			return $this->driverConfig;
 		
 		
-		$this->driverConfig = DriverConfig::parse($this->getPlainConfig());
+		$this->driverConfig = TacoConfig::parse($this->getPlainConfig());
 		
 		return $this->getDriverConfig();
 	}

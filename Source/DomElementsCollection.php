@@ -8,7 +8,6 @@ use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 
@@ -72,13 +71,9 @@ class DomElementsCollection implements IDomElementsCollection
 			
 			throw new ElementNotFoundException($selector);
 		}
-		catch (NoSuchElementException $e)
-		{
-			if (!$byContent)
-				return $this->findByContent($selector);
-			
-			return $this;
-		}
+		
+		if (!$elements && !$byContent)
+			return $this->findByContent($selector);
 		
 		$result = [];
 		

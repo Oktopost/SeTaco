@@ -13,7 +13,7 @@ class BrowserSession implements IBrowserSession
 	private const DEFAULT_BROWSER_NAME = 'defaultBrowser';
 	
 	
-	/** @var DriverConfig */
+	/** @var TacoConfig */
 	private $config;
 	
 	/** @var IOpenBrowserHandler */
@@ -86,7 +86,7 @@ class BrowserSession implements IBrowserSession
 	}
 	
 	
-	public function __construct(DriverConfig $config)
+	public function __construct(TacoConfig $config)
 	{
 		$this->config = $config;
 	}
@@ -220,7 +220,7 @@ class BrowserSession implements IBrowserSession
 		unset($this->browsers[$browserName]);
 	}
 	
-	public function config(): DriverConfig
+	public function config(): TacoConfig
 	{
 		return $this->config;
 	}

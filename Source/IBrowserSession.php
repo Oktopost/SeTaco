@@ -26,5 +26,5 @@ interface IBrowserSession
 	public function closeUnused(): void;
 	public function close($browserName = null): void;
 	
-	public function config(): DriverConfig;
+	public function config(): TacoConfig;
 }

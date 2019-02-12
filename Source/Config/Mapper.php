@@ -4,7 +4,7 @@ namespace SeTaco\Config;
 
 use Cartograph\Base\IMapper;
 use Cartograph\Cartograph;
-use SeTaco\DriverConfig;
+use SeTaco\TacoConfig;
 
 
 class Mapper implements IMapper
@@ -85,11 +85,11 @@ class Mapper implements IMapper
 	 * @map
 	 * @param array $data
 	 * @param Cartograph $c
-	 * @return DriverConfig
+	 * @return TacoConfig
 	 */
-	public static function mapDriverConfig(array $data, Cartograph $c): DriverConfig 
+	public static function mapTacoConfig(array $data, Cartograph $c): TacoConfig 
 	{
-		$object = new DriverConfig();
+		$object = new TacoConfig();
 		
 		foreach ($data as $key => $value)
 		{
@@ -114,10 +114,10 @@ class Mapper implements IMapper
 	}
 	
 	
-	public static function map(array $data): DriverConfig
+	public static function map(array $data): TacoConfig
 	{
 		return self::cartograph()->map()
 			->from($data)
-			->into(DriverConfig::class);
+			->into(TacoConfig::class);
 	}
 }

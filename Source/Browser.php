@@ -5,6 +5,7 @@ namespace SeTaco;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use SeTaco\Config\TargetConfig;
+use SeTaco\Exceptions\Browser\Element\ElementException;
 use SeTaco\Exceptions\Browser\Element\ElementExistsException;
 use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
 use SeTaco\Exceptions\Browser\Element\MultipleElementExistsException;
@@ -104,7 +105,7 @@ class Browser implements IBrowser
 		
 		if ($submit)
 		{
-			$this->click($submit);
+			$this->click($submit, $timeout);
 		}
 		
 		return $this;
@@ -153,17 +154,17 @@ class Browser implements IBrowser
 	
 	public function getElements(string $selector, float $timeout = 2.5): IDomElementsCollection
 	{
-		$result =  new DomElementsCollection($this->getRemoteWebDriver());
+		$result = new DomElementsCollection($this->getRemoteWebDriver());
 		return $result->find($selector, $timeout);
 	}
 	
-	public function tryGetElement(string $selector, float $secToWait = 2.5): ?IDomElement
+	public function tryGetElement(string $selector, float $timeout = 2.5): ?IDomElement
 	{
 		try
 		{
-			return $this->getElement($selector, $secToWait);
+			return $this->getElement($selector, $timeout);
 		}
-		catch (ElementNotFoundException $e)
+		catch (ElementException $e)
 		{
 			return null;
 		}

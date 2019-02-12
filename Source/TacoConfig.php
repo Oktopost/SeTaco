@@ -16,7 +16,7 @@ use SeTaco\Config\TargetConfig;
  * @property ServerConfig	$Server
  * @property TargetConfig[]	$Targets
  */
-class DriverConfig extends LiteObject
+class TacoConfig extends LiteObject
 {
 	/**
 	 * @return array
@@ -41,7 +41,7 @@ class DriverConfig extends LiteObject
 	}
 	
 	
-	public static function parse(array $data): DriverConfig
+	public static function parse(array $data): TacoConfig
 	{
 		return Mapper::map($data);
 	}
