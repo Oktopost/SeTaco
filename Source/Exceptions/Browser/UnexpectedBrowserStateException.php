@@ -1,5 +1,5 @@
 <?php
-namespace SeTaco\Exceptions\Element;
+namespace SeTaco\Exceptions\Browser;
 
 
 use SeTaco\Exceptions\SeTacoException;

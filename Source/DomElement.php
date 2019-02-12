@@ -2,9 +2,11 @@
 namespace SeTaco;
 
 
+use SeTaco\Session\IDomElement;
+use SeTaco\Exceptions\Browser\Element\MissingAttributeException;
+
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
-use SeTaco\Exceptions\Element\MissingAttributeException;
 
 
 class DomElement implements IDomElement

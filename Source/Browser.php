@@ -3,16 +3,14 @@ namespace SeTaco;
 
 
 use Facebook\WebDriver\Cookie;
-use Facebook\WebDriver\Exception\NoSuchElementException;
-use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\WebDriverBy;
-use Facebook\WebDriver\WebDriverExpectedCondition;
-
 use SeTaco\Config\TargetConfig;
-use SeTaco\Exceptions\Browser\URLCompareException;
 use SeTaco\Exceptions\Browser\Element\ElementExistsException;
 use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
+use SeTaco\Exceptions\Browser\Element\MultipleElementExistsException;
+use SeTaco\Exceptions\Browser\URLCompareException;
+use SeTaco\Session\IDomElement;
+use SeTaco\Session\IDomElementsCollection;
 
 
 class Browser implements IBrowser
@@ -88,9 +86,20 @@ class Browser implements IBrowser
 	
 	public function formInput(array $elements, ?string $submit = null, float $timeout = 2.5): IBrowser
 	{
-		foreach ($elements as $css => $input)
+		if (!isset($elements[0]))
 		{
-			$this->input($css, $input, $timeout);
+			foreach ($elements as $name => $value)
+			{
+				$element = $this->getElement('form [name="' . $name . '"]', $timeout);
+				$element->input($value);
+			}
+		}
+		else
+		{
+			foreach ($elements as $css => $input)
+			{
+				$this->input($css, $input, $timeout);
+			}
 		}
 		
 		if ($submit)
@@ -128,31 +137,24 @@ class Browser implements IBrowser
 	
 	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement
 	{
-		try
-		{
-			$selector = ($cssSelector[0] == '/' ? 
-				WebDriverBy::xpath($cssSelector) :
-				WebDriverBy::cssSelector($cssSelector));
-			
-			if ($timeout > 0)
-			{
-				$this->getRemoteWebDriver()
-					->wait((int)$timeout, ($timeout - floor($timeout)) * 1000)
-					->until(WebDriverExpectedCondition::presenceOfElementLocated($selector));
-			}
-			
-			$element = $this->getRemoteWebDriver()->findElement($selector);
-		}
-		catch (TimeOutException $et)
+		$result = $this->getElements($cssSelector, $timeout);
+		
+		if ($result->isEmpty())
 		{
 			throw new ElementNotFoundException($cssSelector);
 		}
-		catch (NoSuchElementException $e)
+		else if ($result->count() > 1)
 		{
-			throw new ElementNotFoundException($cssSelector);
+			throw new MultipleElementExistsException($cssSelector, $timeout);
 		}
 		
-		return new DomElement($element, $this->getRemoteWebDriver());
+		return $result->first();
+	}
+	
+	public function getElements(string $selector, float $timeout = 2.5): IDomElementsCollection
+	{
+		$result =  new DomElementsCollection($this->getRemoteWebDriver());
+		return $result->find($selector, $timeout);
 	}
 	
 	public function tryGetElement(string $selector, float $secToWait = 2.5): ?IDomElement

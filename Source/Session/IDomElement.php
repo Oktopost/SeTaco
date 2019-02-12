@@ -1,5 +1,5 @@
 <?php
-namespace SeTaco;
+namespace SeTaco\Session;
 
 
 use Facebook\WebDriver\Remote\RemoteWebElement;

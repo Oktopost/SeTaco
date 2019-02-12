@@ -5,6 +5,8 @@ namespace SeTaco;
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use SeTaco\Config\TargetConfig;
+use SeTaco\Session\IDomElement;
+use SeTaco\Session\IDomElementsCollection;
 
 
 interface IBrowser
@@ -24,6 +26,7 @@ interface IBrowser
 	public function waitForElement(string $cssSelector, float $timeout = 2.5): void;
 	public function hasElement(string $cssSelector, float $timeout = 2.5): bool;
 	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement;
+	public function getElements(string $selector, float $timeout = 2.5): IDomElementsCollection;
 	public function tryGetElement(string $selector, float $secToWait = 2.5): ?IDomElement;
 	public function compareURL(string $url): bool;
 	public function waitForURL(string $url, float $timeout = 2.5): void;
