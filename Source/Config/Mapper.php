@@ -9,6 +9,10 @@ use SeTaco\TacoConfig;
 
 class Mapper implements IMapper
 {
+	private const CONFIG_KEY_SERVER			= 'server';
+	private const CONFIG_KEY_KEYWORDS		= 'keywords';
+	private const CONFIG_KEY_TARGETS		= 'targets';
+	
 	/** @var Cartograph */
 	private static $cartograph = null;
 	
@@ -90,20 +94,31 @@ class Mapper implements IMapper
 	public static function mapTacoConfig(array $data, Cartograph $c): TacoConfig 
 	{
 		$object = new TacoConfig();
+		$object->Keywords = new KeywordsConfig();
 		
 		foreach ($data as $key => $value)
 		{
-			if (strtolower($key) == 'targets')
+			switch (strtolower($key))
 			{
-				foreach ($value as $targetName => $targetData)
-				{
-					$target = $c->map()->from($targetData)->into(TargetConfig::class);
-					$object->Targets[$targetName] = $target;
-				}
-			}
-			else if (strtolower($key) == 'server')
-			{
-				$object->Server = $c->map()->from($value)->into(ServerConfig::class);
+				case self::CONFIG_KEY_TARGETS:
+					foreach ($value as $dictName => $keywords)
+					{
+						$target = $c->map()->from($keywords)->into(TargetConfig::class);
+						$object->Targets[$dictName] = $target;
+					}
+					
+					break;
+				case self::CONFIG_KEY_KEYWORDS:
+					
+					foreach ($value as $prefix => $constKeywords)
+					{
+						$object->Keywords->addResolver($prefix, $constKeywords);
+					}
+					
+					break;
+				case self::CONFIG_KEY_SERVER:
+					$object->Server = $c->map()->from($value)->into(ServerConfig::class);
+					break;
 			}
 		}
 		

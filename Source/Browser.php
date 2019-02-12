@@ -2,16 +2,19 @@
 namespace SeTaco;
 
 
-use Facebook\WebDriver\Cookie;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use SeTaco\Config\TargetConfig;
+use SeTaco\Session\IDomElement;
+use SeTaco\Session\IDomElementsCollection;
+use SeTaco\Exceptions\SeTacoException;
+use SeTaco\Exceptions\Browser\URLCompareException;
 use SeTaco\Exceptions\Browser\Element\ElementException;
 use SeTaco\Exceptions\Browser\Element\ElementExistsException;
 use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
 use SeTaco\Exceptions\Browser\Element\MultipleElementExistsException;
-use SeTaco\Exceptions\Browser\URLCompareException;
-use SeTaco\Session\IDomElement;
-use SeTaco\Session\IDomElementsCollection;
+
+use Facebook\WebDriver\Cookie;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Structura\Strings;
 
 
 class Browser implements IBrowser
@@ -21,6 +24,28 @@ class Browser implements IBrowser
 	/** @var BrowserSetup */
 	private $config;
 	
+	
+	private function resolveKeyword(string $keyword): array
+	{
+		$result = [];
+		
+		if (Strings::isStartsWith($keyword, 'selector:'))
+		{
+			$result[] = trim(Strings::replace($keyword, 'selector:', ''));
+			return $result;
+		}
+		
+		foreach ($this->config->KeywordsConfig->KeywordResolvers as $resolver)
+		{
+			$mapped = $resolver->resolve($keyword);
+			
+			if ($mapped)
+				$result[] = $mapped;
+		}
+		
+		return $result;
+	}
+
 	
 	public function __construct(BrowserSetup $config)
 	{
@@ -59,47 +84,47 @@ class Browser implements IBrowser
 		return $this;
 	}
 	
-	public function click(string $cssSelector, float $timeout = 2.5): IBrowser
+	public function click(string $keyword, float $timeout = 2.5): IBrowser
 	{
-		$this->getElement($cssSelector, $timeout)->click();
+		$this->getElement($keyword, $timeout)->click(true);
 		return $this;
 	}
 	
-	public function hover(string $cssSelector, float $timeout = 2.5): IBrowser
+	public function hover(string $keyword, float $timeout = 2.5): IBrowser
 	{
-		$element = $this->getElement($cssSelector, $timeout);
+		$element = $this->getElement($keyword, $timeout);
 		$element->hover();
 		
 		return $this;
 	}
 	
-	public function hoverAndClick(string $cssSelector, float $timeout = 2.5): IBrowser
+	public function hoverAndClick(string $keyword, float $timeout = 2.5): IBrowser
 	{
-		$this->hover($cssSelector, $timeout);
-		return $this->click($cssSelector);
+		$this->hover($keyword, $timeout);
+		return $this->click($keyword);
 	}
 	
-	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser
+	public function input(string $keyword, string $value, float $timeout = 2.5): IBrowser
 	{
-		$this->getElement($cssSelector, $timeout)->input($value);
+		$this->getElement($keyword, $timeout)->input($value);
 		return $this;
 	}
 	
-	public function formInput(array $elements, ?string $submit = null, float $timeout = 2.5): IBrowser
+	public function formInput(array $keywordValuePairs, ?string $submit = null, float $timeout = 2.5): IBrowser
 	{
-		if (!isset($elements[0]))
+		if (!isset($keywordValuePairs[0]))
 		{
-			foreach ($elements as $name => $value)
+			foreach ($keywordValuePairs as $name => $value)
 			{
-				$element = $this->getElement('form [name="' . $name . '"]', $timeout);
+				$element = $this->getElement('selector:form [name="' . $name . '"]', $timeout);
 				$element->input($value);
 			}
 		}
 		else
 		{
-			foreach ($elements as $css => $input)
+			foreach ($keywordValuePairs as $keyword => $value)
 			{
-				$this->input($css, $input, $timeout);
+				$this->input($keyword, $value, $timeout);
 			}
 		}
 		
@@ -111,58 +136,78 @@ class Browser implements IBrowser
 		return $this;
 	}
 	
-	public function waitForElementToDisappear(string $cssSelector, float $timeout = 2.5): void
+	public function waitForElementToDisappear(string $keyword, float $timeout = 2.5): void
 	{
 		$endTime = microtime(true) + $timeout;
 		
-		while ($this->tryGetElement($cssSelector, 0.0))
+		while ($this->tryGetElement($keyword, 0.0))
 		{
 			if (microtime(true) >= $endTime)
 			{
-				throw new ElementExistsException($cssSelector, $timeout);
+				throw new ElementExistsException($keyword, $timeout);
 			}
 			
 			usleep(50000);
 		}
 	}
 	
-	public function waitForElement(string $cssSelector, float $timeout = 2.5): void
+	public function waitForElement(string $keyword, float $timeout = 2.5): void
 	{
-		$this->getElement($cssSelector, $timeout);
+		$this->getElement($keyword, $timeout);
 	}
 	
-	public function hasElement(string $cssSelector, float $timeout = 2.5): bool
+	public function hasElement(string $keyword, float $timeout = 2.5): bool
 	{
-		return (bool)$this->tryGetElement($cssSelector, $timeout);
+		return (bool)$this->tryGetElement($keyword, $timeout);
 	}
 	
-	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement
+	public function getElement(string $keyword, float $timeout = 2.5): IDomElement
 	{
-		$result = $this->getElements($cssSelector, $timeout);
+		$result = $this->getElements($keyword, $timeout);
 		
 		if ($result->isEmpty())
 		{
-			throw new ElementNotFoundException($cssSelector);
+			throw new ElementNotFoundException($keyword);
 		}
 		else if ($result->count() > 1)
 		{
-			throw new MultipleElementExistsException($cssSelector, $timeout);
+			throw new MultipleElementExistsException($keyword, $timeout);
 		}
 		
 		return $result->first();
 	}
 	
-	public function getElements(string $selector, float $timeout = 2.5): IDomElementsCollection
+	public function getElements(string $keyword, float $timeout = 2.5): IDomElementsCollection
 	{
+		$selectors = $this->resolveKeyword($keyword);
+		
+		if (!$selectors)
+		{
+			throw new SeTacoException('Keyword ' . $keyword . ' can not be resolved');
+		}
+	
+		$endTime = microtime(true) + $timeout;
+		
 		$result = new DomElementsCollection($this->getRemoteWebDriver());
-		return $result->find($selector, $timeout);
+		$result->findMany($selectors);
+		
+		while ($result->isEmpty())
+		{
+			if (microtime(true) >= $endTime)
+				throw new ElementNotFoundException($keyword);
+			
+			usleep(50000);
+			$result->findMany($selectors);
+		}
+		
+		return $result;
 	}
 	
-	public function tryGetElement(string $selector, float $timeout = 2.5): ?IDomElement
+	public function tryGetElement(string $keyword, float $timeout = 2.5): ?IDomElement
 	{
 		try
 		{
-			return $this->getElement($selector, $timeout);
+			return $this->getElement($keyword, $timeout);
 		}
 		catch (ElementException $e)
 		{

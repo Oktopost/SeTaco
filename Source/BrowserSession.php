@@ -50,6 +50,7 @@ class BrowserSession implements IBrowserSession
 		$setup->TargetConfig = $targetConfig;
 		$setup->TargetName = $targetName;
 		$setup->BrowserName = $browserName;
+		$setup->KeywordsConfig = $this->config->Keywords;
 		
 		$browser = new Browser($setup);
 		

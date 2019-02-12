@@ -16,18 +16,18 @@ interface IBrowser
 	public function getTargetConfig(): TargetConfig;
 	public function getBrowserName(): string;
 	public function goto(string $url): IBrowser;
-	public function click(string $cssSelector, float $timeout = 2.5): IBrowser;
-	public function hover(string $cssSelector, float $timeout = 2.5): IBrowser;
-	public function hoverAndClick(string $cssSelector, float $timeout = 2.5): IBrowser;
-	public function formInput(array $elements, ?string $submit = null, float $timeout = 2.5): IBrowser;
-	public function input(string $cssSelector, string $value, float $timeout = 2.5): IBrowser;
+	public function click(string $keyword, float $timeout = 2.5): IBrowser;
+	public function hover(string $keyword, float $timeout = 2.5): IBrowser;
+	public function hoverAndClick(string $keyword, float $timeout = 2.5): IBrowser;
+	public function formInput(array $keywordValuePairs, ?string $submit = null, float $timeout = 2.5): IBrowser;
+	public function input(string $keyword, string $value, float $timeout = 2.5): IBrowser;
 	
-	public function waitForElementToDisappear(string $cssSelector, float $timeout = 2.5): void;
-	public function waitForElement(string $cssSelector, float $timeout = 2.5): void;
-	public function hasElement(string $cssSelector, float $timeout = 2.5): bool;
-	public function getElement(string $cssSelector, float $timeout = 2.5): IDomElement;
-	public function getElements(string $selector, float $timeout = 2.5): IDomElementsCollection;
-	public function tryGetElement(string $selector, float $timeout = 2.5): ?IDomElement;
+	public function waitForElementToDisappear(string $keyword, float $timeout = 2.5): void;
+	public function waitForElement(string $keyword, float $timeout = 2.5): void;
+	public function hasElement(string $keyword, float $timeout = 2.5): bool;
+	public function getElement(string $keyword, float $timeout = 2.5): IDomElement;
+	public function getElements(string $keyword, float $timeout = 2.5): IDomElementsCollection;
+	public function tryGetElement(string $keyword, float $timeout = 2.5): ?IDomElement;
 	public function compareURL(string $url): bool;
 	public function waitForURL(string $url, float $timeout = 2.5): void;
 	

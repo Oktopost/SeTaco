@@ -5,7 +5,8 @@ namespace SeTaco\Session;
 
 interface IDomElementsCollection
 {
-	public function find(string $selector, ?float $timeout = 2.5): IDomElementsCollection;
+	public function find(string $selector): IDomElementsCollection;
+	public function findMany(array $selectors): IDomElementsCollection;
 	
 	public function filter(callable $closure): IDomElementsCollection;
 	public function each(callable $closure): IDomElementsCollection;

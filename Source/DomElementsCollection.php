@@ -4,12 +4,11 @@ namespace SeTaco;
 
 use SeTaco\Session\IDomElement;
 use SeTaco\Session\IDomElementsCollection;
-use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\Exception\TimeOutException;
-use Facebook\WebDriver\WebDriverExpectedCondition;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Structura\Strings;
 
 
 class DomElementsCollection implements IDomElementsCollection
@@ -26,14 +25,6 @@ class DomElementsCollection implements IDomElementsCollection
 		return new DomElementsCollection($this->driver, $elements);
 	}
 	
-	private function findByContent(string $text): IDomElementsCollection
-	{
-		$byValueCollection = $this->find('input[value="' . $text . '"]', 0)->get();
-		$byContentCollection = $this->find('//*[contains(text(), "' . $text . '")]', 0)->get();
-		
-		return $this->asNewCollection(array_merge($byValueCollection, $byContentCollection));
-	}
-	
 	
 	public function __construct(RemoteWebDriver $driver, ?array $predefinedElements = [])
 	{
@@ -44,10 +35,9 @@ class DomElementsCollection implements IDomElementsCollection
 	}
 	
 	
-	public function find(string $selector, ?float $timeout = 2.5): IDomElementsCollection
+	public function find(string $selector): IDomElementsCollection
 	{
-		$isXpath = $selector[0] == '/';
-		$byContent = strstr($selector, 'value=') || strstr($selector, 'contains');
+		$isXpath = Strings::isStartsWith($selector, '//');
 		
 		try
 		{
@@ -55,31 +45,39 @@ class DomElementsCollection implements IDomElementsCollection
 				WebDriverBy::xpath($selector) :
 				WebDriverBy::cssSelector($selector));
 			
-			if ($timeout && $timeout > 0)
-			{
-				$this->driver
-					->wait((int)$timeout, ($timeout - floor($timeout)) * 1000)
-					->until(WebDriverExpectedCondition::presenceOfElementLocated($search));
-			}
-			
 			$elements = $this->driver->findElements($search);
 		}
-		catch (TimeOutException $et)
+		catch (NoSuchElementException $ne)
 		{
-			if (!$byContent)
-				return $this->findByContent($selector);
-			
-			throw new ElementNotFoundException($selector);
+			return $this;
 		}
-		
-		if (!$elements && !$byContent)
-			return $this->findByContent($selector);
 		
 		$result = [];
 		
 		foreach ($elements as $element)
 		{
 			$result[] = new DomElement($element, $this->driver);
+		}
+		
+		$this->collection = $result;
+		
+		return $this;
+	}
+	
+	public function findMany(array $selectors): IDomElementsCollection
+	{
+		$result = [];
+		$this->collection = [];
+		
+		foreach ($selectors as $selector)
+		{
+			$this->find($selector);
+			
+			if (!$this->isEmpty())
+			{
+				$result = array_merge($result, $this->collection);
+				$this->collection = [];
+			}
 		}
 		
 		$this->collection = $result;
