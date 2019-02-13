@@ -2,11 +2,13 @@
 namespace SeTaco;
 
 
-use Facebook\WebDriver\Cookie;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
 use SeTaco\Config\TargetConfig;
 use SeTaco\Session\IDomElement;
 use SeTaco\Session\IDomElementsCollection;
+
+use Facebook\WebDriver\Cookie;
+use Facebook\WebDriver\Remote\RemoteKeyboard;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 
 interface IBrowser
@@ -21,6 +23,7 @@ interface IBrowser
 	public function hoverAndClick(string $keyword, float $timeout = 2.5): IBrowser;
 	public function formInput(array $keywordValuePairs, ?string $submit = null, float $timeout = 2.5): IBrowser;
 	public function input(string $keyword, string $value, float $timeout = 2.5): IBrowser;
+	public function keyboard(): RemoteKeyboard;
 	
 	public function waitForElementToDisappear(string $keyword, float $timeout = 2.5): void;
 	public function waitForElement(string $keyword, float $timeout = 2.5): void;

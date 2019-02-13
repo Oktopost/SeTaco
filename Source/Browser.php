@@ -14,6 +14,8 @@ use SeTaco\Exceptions\Browser\Element\MultipleElementExistsException;
 
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\RemoteKeyboard;
+
 use Structura\Strings;
 
 
@@ -108,6 +110,11 @@ class Browser implements IBrowser
 	{
 		$this->getElement($keyword, $timeout)->input($value);
 		return $this;
+	}
+	
+	public function keyboard(): RemoteKeyboard
+	{
+		return $this->getRemoteWebDriver()->getKeyboard();
 	}
 	
 	public function formInput(array $keywordValuePairs, ?string $submit = null, float $timeout = 2.5): IBrowser

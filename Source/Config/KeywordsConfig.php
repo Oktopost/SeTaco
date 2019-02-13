@@ -46,7 +46,11 @@ class KeywordsConfig extends LiteObject
 	
 		if (is_string($resolver))
 		{
-			if (is_array($selector))
+			if (is_callable($selector))
+			{
+				$this->KeywordResolvers[] = new CallbackKeywordResolver($resolver, $selector);
+			}
+			else if (is_array($selector))
 			{
 				$this->KeywordResolvers[] = new ConstKeywordResolver($resolver, $selector);
 			}
