@@ -13,6 +13,7 @@ class Mapper implements IMapper
 	private const CONFIG_KEY_KEYWORDS		= 'keywords';
 	private const CONFIG_KEY_TARGETS		= 'targets';
 	
+	
 	/** @var Cartograph */
 	private static $cartograph = null;
 	
@@ -101,21 +102,20 @@ class Mapper implements IMapper
 			switch (strtolower($key))
 			{
 				case self::CONFIG_KEY_TARGETS:
-					foreach ($value as $dictName => $keywords)
-					{
-						$target = $c->map()->from($keywords)->into(TargetConfig::class);
-						$object->Targets[$dictName] = $target;
-					}
-					
+					$object->Targets = $c->map()
+						->fromArray($value)
+						->keepIndexes()
+						->into(TargetConfig::class);
 					break;
-				case self::CONFIG_KEY_KEYWORDS:
 					
+				case self::CONFIG_KEY_KEYWORDS:
 					foreach ($value as $prefix => $constKeywords)
 					{
 						$object->Keywords->addResolver($prefix, $constKeywords);
 					}
 					
 					break;
+					
 				case self::CONFIG_KEY_SERVER:
 					$object->Server = $c->map()->from($value)->into(ServerConfig::class);
 					break;

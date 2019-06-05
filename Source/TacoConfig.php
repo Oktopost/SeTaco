@@ -43,6 +43,11 @@ class TacoConfig extends LiteObject
 		return $this->Server->createDriver();
 	}
 	
+	public function hasTarget(string $targetName): bool
+	{
+		return isset($this->Targets[$targetName]);
+	}
+	
 	
 	public static function parse(array $data): TacoConfig
 	{

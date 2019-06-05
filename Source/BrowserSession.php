@@ -26,14 +26,9 @@ class BrowserSession implements IBrowserSession
 	private $browsers = [];
 	
 	
-	private function hasTarget(string $targetName): bool
-	{
-		return isset($this->config->Targets[$targetName]);
-	}
-	
 	private function getTarget(string $targetName): ?TargetConfig
 	{
-		return $this->hasTarget($targetName) ? $this->config->Targets[$targetName] : null;
+		return $this->config->hasTarget($targetName) ? $this->config->Targets[$targetName] : null;
 	}
 	
 	private function openBrowser(string $browserName, TargetConfig $targetConfig, ?string $targetName = null): IBrowser
@@ -114,7 +109,7 @@ class BrowserSession implements IBrowserSession
 			return $this->open($target, $browserName);
 		}
 		
-		if (!$this->hasTarget($target))
+		if (!$this->config->hasTarget($target))
 			return $this->openBrowserForURL($target, $browserName);
 		
 		$targetConfig = $this->getTarget($target);
