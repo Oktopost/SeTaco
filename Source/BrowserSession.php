@@ -210,7 +210,7 @@ class BrowserSession implements IBrowserSession
 		
 		/** @noinspection PhpNonStrictObjectEqualityInspection */
 		if ($browser == $this->current)
-			unset($this->current);
+			$this->current = null;
 		
 		$browser->close();
 		unset($this->browsers[$browserName]);
