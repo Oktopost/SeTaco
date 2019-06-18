@@ -48,7 +48,18 @@ class DomElement implements IDomElement
 	
 	public function input(string $input): void
 	{
+		$this->element->clear();
 		$this->element->sendKeys($input);
+	}
+	
+	public function appendInput(string $input): void
+	{
+		$this->element->sendKeys($input);
+	}
+	
+	public function clear(): void
+	{
+		$this->element->clear();
 	}
 	
 	public function getName(bool $allowMissing = true): ?string
