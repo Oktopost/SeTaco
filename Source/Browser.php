@@ -165,7 +165,14 @@ class Browser implements IBrowser
 	
 	public function hasElement(string $keyword, float $timeout = 2.5): bool
 	{
-		return (bool)$this->tryGetElement($keyword, $timeout);
+		try
+		{
+			return !$this->getElements($keyword, $timeout)->isEmpty();
+		}
+		catch (ElementNotFoundException $e)
+		{
+			return false;
+		}
 	}
 	
 	public function getElement(string $keyword, float $timeout = 2.5): IDomElement
