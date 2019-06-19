@@ -216,7 +216,7 @@ class Browser implements IBrowser
 		{
 			return $this->getElement($keyword, $timeout);
 		}
-		catch (ElementException $e)
+		catch (ElementNotFoundException $e)
 		{
 			return null;
 		}
