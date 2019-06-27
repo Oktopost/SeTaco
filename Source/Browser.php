@@ -7,7 +7,6 @@ use SeTaco\Session\IDomElement;
 use SeTaco\Session\IDomElementsCollection;
 use SeTaco\Exceptions\SeTacoException;
 use SeTaco\Exceptions\Browser\URLCompareException;
-use SeTaco\Exceptions\Browser\Element\ElementException;
 use SeTaco\Exceptions\Browser\Element\ElementExistsException;
 use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
 use SeTaco\Exceptions\Browser\Element\MultipleElementExistsException;
@@ -315,5 +314,15 @@ class Browser implements IBrowser
 	public function cookies(): array
 	{
 		return $this->getRemoteWebDriver()->manage()->getCookies();
+	}
+	
+	public function deleteCookie(string $named): void
+	{
+		$this->getRemoteWebDriver()->manage()->deleteCookieNamed($named);
+	}
+	
+	public function deleteCookies(): void
+	{
+		$this->getRemoteWebDriver()->manage()->deleteAllCookies();
 	}
 }

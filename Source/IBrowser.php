@@ -50,4 +50,7 @@ interface IBrowser
 	 * @return Cookie[]
 	 */
 	public function cookies(): array;
+	
+	public function deleteCookie(string $named): void;
+	public function deleteCookies(): void;
 }
