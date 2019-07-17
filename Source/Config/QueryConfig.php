@@ -115,16 +115,26 @@ class QueryConfig
 	
 	
 	/**
-	 * @param string $key
+	 * @param string|string[] $key
 	 * @param IQueryResolver|callable|string $resolver
 	 */
-	public function addResolver(string $key, $resolver): void
+	public function addResolver($key, $resolver): void
 	{
-		if (isset($this->queryResolvers[$key]))
-			throw new SeTacoException("Resolver for the key $key, is already defined");
-		
-		$resolver = $this->getResolver($resolver);
-		$this->queryResolvers[$key] = $resolver;
+		if (is_array($key))
+		{
+			foreach ($key as $k)
+			{
+				$this->addResolver($k, $resolver);
+			}
+		}
+		else
+		{
+			if (isset($this->queryResolvers[$key]))
+				throw new SeTacoException("Resolver for the key $key, is already defined");
+			
+			$resolver = $this->getResolver($resolver);
+			$this->queryResolvers[$key] = $resolver;
+		}
 	}
 	
 	/**
