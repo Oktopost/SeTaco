@@ -19,7 +19,7 @@ class TargetConfig extends LiteObject
 	protected function _setup()
 	{
 		return [
-			'URL'	=> LiteSetup::createString('localhost'),
+			'URL'	=> LiteSetup::createString('http://localhost'),
 			'Port'	=> LiteSetup::createInt(80)
 		];
 	}

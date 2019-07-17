@@ -98,7 +98,7 @@ class BrowserSession implements IBrowserSession
 		$this->handler = $handler;
 	}
 	
-	public function open(string $target, ?string $browserName = null): IBrowser
+	public function open(string $target = 'default', ?string $browserName = null): IBrowser
 	{
 		if (!$browserName)
 			$browserName = self::DEFAULT_BROWSER_NAME;

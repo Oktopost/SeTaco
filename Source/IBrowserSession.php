@@ -9,7 +9,7 @@ interface IBrowserSession
 {
 	public function setOpenBrowserHandler(IOpenBrowserHandler $handler): void;
 	
-	public function open(string $target, ?string $browserName = null): IBrowser;
+	public function open(string $target = 'default', ?string $browserName = null): IBrowser;
 	public function getBrowser(string $browserName): ?IBrowser;
 	
 	public function hasBrowser(string $browserName): bool;

@@ -10,12 +10,12 @@ use Objection\LiteObject;
 use SeTaco\Config\Mapper;
 use SeTaco\Config\ServerConfig;
 use SeTaco\Config\TargetConfig;
-use SeTaco\Config\KeywordsConfig;
+use SeTaco\Config\QueryConfig;
 
 
 /**
  * @property ServerConfig	$Server
- * @property KeywordsConfig $Keywords
+ * @property QueryConfig $Keywords
  * @property TargetConfig[]	$Targets
  */
 class TacoConfig extends LiteObject
@@ -27,7 +27,7 @@ class TacoConfig extends LiteObject
 	{
 		return [
 			'Server'	=> LiteSetup::createInstanceOf(ServerConfig::class),
-			'Keywords'	=> LiteSetup::createInstanceOf(KeywordsConfig::class),
+			'Keywords'	=> LiteSetup::createInstanceOf(QueryConfig::class),
 			'Targets'	=> LiteSetup::createInstanceArray(TargetConfig::class),
 		];
 	}

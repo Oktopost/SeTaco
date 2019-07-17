@@ -95,7 +95,7 @@ class Mapper implements IMapper
 	public static function mapTacoConfig(array $data, Cartograph $c): TacoConfig 
 	{
 		$object = new TacoConfig();
-		$object->Keywords = new KeywordsConfig();
+		$object->Keywords = new QueryConfig();
 		
 		foreach ($data as $key => $value)
 		{
