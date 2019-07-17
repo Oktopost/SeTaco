@@ -2,9 +2,9 @@
 namespace SeTaco\Query\Resolvers;
 
 
-use SeTaco\Exceptions\SeTacoException;
 use SeTaco\IQueryResolver;
 use SeTaco\Query\ISelector;
+use SeTaco\Exceptions\SeTacoException;
 use Structura\Strings;
 
 
@@ -19,7 +19,6 @@ class ByAttributeResolver implements IQueryResolver
 			$tag = "lower-case($tag)";
 			$value = strtolower($value);
 		}
-		
 		
 		return "//body//{$type}[{$tag}=\"$value\"][not(self::script)]";
 	}

@@ -3,13 +3,12 @@ namespace SeTaco\Config;
 
 
 use SeTaco\IQueryResolver;
+use SeTaco\Query\Selector;
+use SeTaco\Query\ISelector;
+use SeTaco\Query\Resolvers\CallbackQueryResolver;
 use SeTaco\Exceptions\SeTacoException;
 use SeTaco\Exceptions\FatalSeTacoException;
 
-use SeTaco\Query\ISelector;
-use SeTaco\Query\Resolvers\CallbackQueryResolver;
-
-use SeTaco\Query\Selector;
 use Structura\Strings;
 
 
@@ -55,7 +54,7 @@ class QueryConfig
 		
 		if (!is_null($result))
 		{
-			return $this->toSelector($result);
+			return $this->toSelector($result, $resolver);
 		}
 		else
 		{
