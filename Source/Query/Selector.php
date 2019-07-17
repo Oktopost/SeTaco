@@ -51,6 +51,11 @@ class Selector implements ISelector
 		return $this->query == $this->originalQuery;
 	}
 	
+	public function setOriginal(string $original): void
+	{
+		$this->originalQuery = $original;
+	}
+	
 	public function resolver(): ?IQueryResolver
 	{
 		return $this->resolver;

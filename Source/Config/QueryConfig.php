@@ -52,14 +52,13 @@ class QueryConfig
 	{
 		$result = $resolver->resolve($query, $isCaseSensitive);
 		
-		if (!is_null($result))
-		{
-			return $this->toSelector($result, $resolver);
-		}
-		else
-		{
+		if (is_null($result))
 			return null;
-		}
+		
+		$selector = $this->toSelector($result, $resolver);
+		$selector->setOriginal($query);
+		
+		return $selector;
 	}
 	
 	private function resolveByKeyword(string $query, bool $isCaseSensitive): ?ISelector
@@ -156,7 +155,8 @@ class QueryConfig
 		
 		if (!$selector)
 		{
-			$this->toSelector($query);
+			$selector = $this->toSelector($query);
+			$selector->setOriginal($query);
 		}
 			
 		return $selector;
