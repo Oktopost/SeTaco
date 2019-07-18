@@ -14,6 +14,8 @@ use Structura\Strings;
 
 class QueryConfig
 {
+	private $defaultTimeout = 2.5;
+	
 	/** @var IQueryResolver[] */
 	private $queryResolvers = [];
 	
@@ -90,7 +92,6 @@ class QueryConfig
 		return null;
 	}
 	
-	
 	private function getResolver($resolver): IQueryResolver
 	{
 		if ($resolver instanceof IQueryResolver)
@@ -160,5 +161,23 @@ class QueryConfig
 		}
 			
 		return $selector;
+	}
+	
+	public function setDefaultTimeout(float $default): void
+	{
+		if ($default < 0.0)
+			throw new SeTacoException("Default timeout must be 0 or greater. Got $default");
+		
+		$this->defaultTimeout = $default;
+	}
+	
+	public function getTimeout(?float $given): float
+	{
+		return is_null($given) ? $this->defaultTimeout : $given;
+	}
+	
+	public function getWaitUntil(?float $given): float
+	{
+		return microtime() + (is_null($given) ? $this->defaultTimeout : $given);
 	}
 }

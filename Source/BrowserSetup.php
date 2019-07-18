@@ -10,11 +10,11 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 
 
 /**
- * @property RemoteWebDriver $RemoteWebDriver
- * @property QueryConfig $KeywordsConfig
- * @property TargetConfig $TargetConfig
- * @property string|null $TargetName
- * @property string $BrowserName
+ * @property RemoteWebDriver	$RemoteWebDriver
+ * @property QueryConfig		$QueryConfig
+ * @property TargetConfig		$TargetConfig
+ * @property string|null		$TargetName
+ * @property string				$BrowserName
  */
 class BrowserSetup extends LiteObject
 {
@@ -22,7 +22,7 @@ class BrowserSetup extends LiteObject
 	{
 		return [
 			'RemoteWebDriver' 	=> LiteSetup::createInstanceOf(RemoteWebDriver::class),
-			'KeywordsConfig'	=> LiteSetup::createInstanceOf(QueryConfig::class),
+			'QueryConfig'		=> LiteSetup::createInstanceOf(QueryConfig::class),
 			'TargetConfig'    	=> LiteSetup::createInstanceOf(TargetConfig::class),
 			'TargetName'      	=> LiteSetup::createString(null),
 			'BrowserName'     	=> LiteSetup::createString()

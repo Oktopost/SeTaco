@@ -19,7 +19,7 @@ class ByContentResolver implements IQueryResolver
 		
 		if (!$isCaseSensitive)
 		{
-			$text = "lower-case($text)";
+			$text = AbstractResolveHelper::toLowercase($text);
 			$query = strtolower($query);
 		}
 		

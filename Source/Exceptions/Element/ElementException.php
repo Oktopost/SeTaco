@@ -1,5 +1,5 @@
 <?php
-namespace SeTaco\Exceptions\Browser\Element;
+namespace SeTaco\Exceptions\Element;
 
 
 use SeTaco\Exceptions\Browser\UnexpectedBrowserStateException;

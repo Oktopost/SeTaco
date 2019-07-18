@@ -3,22 +3,17 @@ namespace SeTaco;
 
 
 use SeTaco\Config\TargetConfig;
-use SeTaco\Session\IDomElement;
-use SeTaco\Session\IDomElementsCollection;
-use SeTaco\Exceptions\SeTacoException;
 use SeTaco\Exceptions\Browser\URLCompareException;
-use SeTaco\Exceptions\Browser\Element\ElementExistsException;
-use SeTaco\Exceptions\Browser\Element\ElementNotFoundException;
-use SeTaco\Exceptions\Browser\Element\MultipleElementExistsException;
 
 use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteKeyboard;
 
+use Structura\Arrays;
 use Structura\Strings;
 
 
-class Browser implements IBrowser
+class Browser extends Query implements IBrowser
 {
 	private $isClosed = false;
 	
@@ -26,30 +21,9 @@ class Browser implements IBrowser
 	private $config;
 	
 	
-	private function resolveKeyword(string $keyword): array
-	{
-		$result = [];
-		
-		if (Strings::isStartsWith($keyword, 'selector:'))
-		{
-			$result[] = trim(Strings::replace($keyword, 'selector:', ''));
-			return $result;
-		}
-		
-		foreach ($this->config->KeywordsConfig->KeywordResolvers as $resolver)
-		{
-			$mapped = $resolver->resolve($keyword);
-			
-			if ($mapped)
-				$result[] = $mapped;
-		}
-		
-		return $result;
-	}
-
-	
 	public function __construct(BrowserSetup $config)
 	{
+		parent::__construct($config, $config->RemoteWebDriver);
 		$this->config = $config;
 	}
 	
@@ -85,147 +59,30 @@ class Browser implements IBrowser
 		return $this;
 	}
 	
-	public function click(string $keyword, float $timeout = 2.5): IBrowser
-	{
-		$this->getElement($keyword, $timeout)->click(true);
-		return $this;
-	}
-	
-	public function hover(string $keyword, float $timeout = 2.5): IBrowser
-	{
-		$element = $this->getElement($keyword, $timeout);
-		$element->hover();
-		
-		return $this;
-	}
-	
-	public function hoverAndClick(string $keyword, float $timeout = 2.5): IBrowser
-	{
-		$this->hover($keyword, $timeout);
-		return $this->click($keyword);
-	}
-	
-	public function input(string $keyword, string $value, float $timeout = 2.5): IBrowser
-	{
-		$this->getElement($keyword, $timeout)->input($value);
-		return $this;
-	}
-	
 	public function keyboard(): RemoteKeyboard
 	{
 		return $this->getRemoteWebDriver()->getKeyboard();
 	}
 	
-	public function formInput(array $keywordValuePairs, ?string $submit = null, float $timeout = 2.5): IBrowser
+	public function formInput(array $keywordValuePairs, ?string $submit = null, ?float $timeout = null): IBrowser
 	{
-		if (!isset($keywordValuePairs[0]))
+		foreach ($keywordValuePairs as $query => $value)
 		{
-			foreach ($keywordValuePairs as $name => $value)
-			{
-				$element = $this->getElement('selector:form [name="' . $name . '"]', $timeout);
-				$element->input($value);
-			}
-		}
-		else
-		{
-			foreach ($keywordValuePairs as $keyword => $value)
-			{
-				$this->input($keyword, $value, $timeout);
-			}
+			if (!Strings::contains($query, ':'))
+				$query = "attr:form//input name=$query";
+			
+			$this->input($query, $value, $timeout);
 		}
 		
 		if ($submit)
 		{
+			if (!Strings::contains($submit, ':'))
+				$submit = "txt:$submit";
+			
 			$this->click($submit, $timeout);
 		}
 		
 		return $this;
-	}
-	
-	public function waitForElementToDisappear(string $keyword, float $timeout = 2.5): void
-	{
-		$endTime = microtime(true) + $timeout;
-		
-		while ($this->tryGetElement($keyword, 0.0))
-		{
-			if (microtime(true) >= $endTime)
-			{
-				throw new ElementExistsException($keyword, $timeout);
-			}
-			
-			usleep(50000);
-		}
-	}
-	
-	public function waitForElement(string $keyword, float $timeout = 2.5): void
-	{
-		$this->getElement($keyword, $timeout);
-	}
-	
-	public function hasElement(string $keyword, float $timeout = 2.5): bool
-	{
-		try
-		{
-			return !$this->getElements($keyword, $timeout)->isEmpty();
-		}
-		catch (ElementNotFoundException $e)
-		{
-			return false;
-		}
-	}
-	
-	public function getElement(string $keyword, float $timeout = 2.5): IDomElement
-	{
-		$result = $this->getElements($keyword, $timeout);
-		
-		if ($result->isEmpty())
-		{
-			throw new ElementNotFoundException($keyword);
-		}
-		else if ($result->count() > 1)
-		{
-			throw new MultipleElementExistsException($keyword, $timeout);
-		}
-		
-		return $result->first();
-	}
-	
-	public function getElements(string $keyword, float $timeout = 2.5): IDomElementsCollection
-	{
-		$selectors = $this->resolveKeyword($keyword);
-		
-		if (!$selectors)
-		{
-			throw new SeTacoException('Keyword ' . $keyword . ' can not be resolved');
-		}
-	
-		$endTime = microtime(true) + $timeout;
-		
-		$result = new DomElementsCollection($this->getRemoteWebDriver());
-		$result->findMany($selectors);
-		
-		while ($result->isEmpty())
-		{
-			if (microtime(true) >= $endTime)
-				throw new ElementNotFoundException($keyword);
-			
-			usleep(50000);
-			$result->findMany($selectors);
-		}
-		
-		return $result;
-	}
-	
-	public function tryGetElement(string $keyword, float $timeout = 2.5): ?IDomElement
-	{
-		try
-		{
-			return $this->getElement($keyword, $timeout);
-		}
-		catch (ElementNotFoundException $e)
-		{
-			return null;
-		}
 	}
 	
 	public function compareURL(string $url): bool
@@ -240,8 +97,9 @@ class Browser implements IBrowser
 		return preg_match($pattern, $currentURL);
 	}
 	
-	public function waitForURL(string $url, float $timeout = 2.5): void
+	public function waitForURL(string $url, ?float $timeout = null): void
 	{
+		$timeout = $this->config->QueryConfig->getTimeout($timeout);
 		$endTime = microtime(true) + $timeout;
 		
 		while (!$this->compareURL($url))

@@ -10,20 +10,6 @@ use Structura\Strings;
 
 class ByAttributeResolver implements IQueryResolver
 {
-	protected function generateResolve(string $type, string $tag, string $value, bool $isCaseSensitive): string
-	{
-		$tag = "@$tag";
-		
-		if (!$isCaseSensitive)
-		{
-			$tag = "lower-case($tag)";
-			$value = strtolower($value);
-		}
-		
-		return "//body//{$type}[{$tag}=\"$value\"][not(self::script)]";
-	}
-	
-	
 	/**
 	 * @param string $query
 	 * @param bool $isCaseSensitive
@@ -31,13 +17,13 @@ class ByAttributeResolver implements IQueryResolver
 	 */
 	public function resolve(string $query, bool $isCaseSensitive)
 	{
-		if (!Strings::contains('=', $query))
-			throw new SeTacoException('Attribute resolver must contain the = sign, "Name=Value"');
+		if (!Strings::contains($query, '='))
+			throw new SeTacoException('Attribute resolver must contain the = sign, "Name=Value". Got ' . $query);
 		
 		[$key, $value] = explode('=', $query, 2);
 		$input = '*';
 		
-		if (Strings::contains(' ', $key))
+		if (Strings::contains($key, ' '))
 		{
 			[$input, $key] = explode(' ', $key, 2);
 		}

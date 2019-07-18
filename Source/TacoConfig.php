@@ -7,6 +7,8 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Objection\LiteSetup;
 use Objection\LiteObject;
 
+use SeTaco\Query\DefaultSetup;
+
 use SeTaco\Config\Mapper;
 use SeTaco\Config\ServerConfig;
 use SeTaco\Config\TargetConfig;
@@ -15,7 +17,7 @@ use SeTaco\Config\QueryConfig;
 
 /**
  * @property ServerConfig	$Server
- * @property QueryConfig $Keywords
+ * @property QueryConfig	$Query
  * @property TargetConfig[]	$Targets
  */
 class TacoConfig extends LiteObject
@@ -27,7 +29,7 @@ class TacoConfig extends LiteObject
 	{
 		return [
 			'Server'	=> LiteSetup::createInstanceOf(ServerConfig::class),
-			'Keywords'	=> LiteSetup::createInstanceOf(QueryConfig::class),
+			'Query'		=> LiteSetup::createInstanceOf(QueryConfig::class),
 			'Targets'	=> LiteSetup::createInstanceArray(TargetConfig::class),
 		];
 	}
@@ -49,8 +51,15 @@ class TacoConfig extends LiteObject
 	}
 	
 	
-	public static function parse(array $data): TacoConfig
+	public static function parse(array $data, bool $skipDefaultSelectors = false): TacoConfig
 	{
-		return Mapper::map($data);
+		$config = Mapper::map($data);
+		
+		if (!$skipDefaultSelectors)
+		{
+			DefaultSetup::setup($config->Query);
+		}
+		
+		return $config;
 	}
 }

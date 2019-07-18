@@ -10,11 +10,16 @@ class AbstractResolveHelper
 		
 		if (!$isCaseSensitive)
 		{
-			$tag = "lower-case($tag)";
+			$tag = self::toLowercase("$tag");
 			$value = strtolower($value);
 		}
 		
 		
 		return "//body//{$type}[{$tag}=\"$value\"][not(self::script)]";
+	}
+	
+	public static function toLowercase(string $item): string
+	{
+		return "translate($item, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')";
 	}
 }

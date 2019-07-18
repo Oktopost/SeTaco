@@ -2,10 +2,7 @@
 namespace SeTaco;
 
 
-use SeTaco\Session\IDomElement;
-use SeTaco\Exceptions\Browser\Element\MissingAttributeException;
-
-use Facebook\WebDriver\Remote\RemoteWebDriver;
+use SeTaco\Exceptions\Element\MissingAttributeException;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 
 
@@ -14,13 +11,13 @@ class DomElement implements IDomElement
 	/** @var RemoteWebElement */
 	private $element;
 	
-	/** @var RemoteWebDriver */
-	private $driver;
+	/** @var BrowserSetup */
+	private $setup;
 	
 	
-	public function __construct(RemoteWebElement $element, RemoteWebDriver $driver)
+	public function __construct(RemoteWebElement $element, BrowserSetup $setup)
 	{
-		$this->driver = $driver;
+		$this->setup = $setup;
 		$this->element = $element;
 	}
 	
@@ -31,35 +28,43 @@ class DomElement implements IDomElement
 	}
 	
 	
-	public function click(bool $hover = false): void
+	public function click(bool $hover = false): IDomElement
 	{
 		if ($hover)
 			$this->hover();
 		
 		$this->element->click();
+		
+		return $this;
 	}
 	
-	public function hover(): void
+	public function hover(): IDomElement
 	{
-		$this->driver->action()
+		$this->setup->RemoteWebDriver
+			->action()
 			->moveToElement($this->element)
 			->perform();
+		
+		return $this;
 	}
 	
-	public function input(string $input): void
+	public function input(string $input): IDomElement
 	{
 		$this->element->clear();
 		$this->element->sendKeys($input);
+		return $this;
 	}
 	
-	public function appendInput(string $input): void
+	public function appendInput(string $input): IDomElement
 	{
 		$this->element->sendKeys($input);
+		return $this;
 	}
 	
-	public function clear(): void
+	public function clear(): IDomElement
 	{
 		$this->element->clear();
+		return $this;
 	}
 	
 	public function getName(bool $allowMissing = true): ?string
@@ -75,5 +80,10 @@ class DomElement implements IDomElement
 			throw new MissingAttributeException($name);
 		
 		return $value;
+	}
+	
+	public function query(): IQuery
+	{
+		return new Query($this->setup, $this->element);
 	}
 }

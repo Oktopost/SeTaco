@@ -2,16 +2,16 @@
 namespace SeTaco\Config;
 
 
-use Cartograph\Base\IMapper;
-use Cartograph\Cartograph;
 use SeTaco\TacoConfig;
+use Cartograph\Cartograph;
+use Cartograph\Base\IMapper;
 
 
 class Mapper implements IMapper
 {
 	private const CONFIG_KEY_SERVER			= 'server';
-	private const CONFIG_KEY_KEYWORDS		= 'keywords';
 	private const CONFIG_KEY_TARGETS		= 'targets';
+	private const CONFIG_DEFAULT_TIMEOUT	= 'timeout';
 	
 	
 	/** @var Cartograph */
@@ -95,7 +95,7 @@ class Mapper implements IMapper
 	public static function mapTacoConfig(array $data, Cartograph $c): TacoConfig 
 	{
 		$object = new TacoConfig();
-		$object->Keywords = new QueryConfig();
+		$object->Query = new QueryConfig();
 		
 		foreach ($data as $key => $value)
 		{
@@ -108,12 +108,8 @@ class Mapper implements IMapper
 						->into(TargetConfig::class);
 					break;
 					
-				case self::CONFIG_KEY_KEYWORDS:
-					foreach ($value as $prefix => $constKeywords)
-					{
-						$object->Keywords->addResolver($prefix, $constKeywords);
-					}
-					
+				case self::CONFIG_DEFAULT_TIMEOUT:
+					$object->Query->setDefaultTimeout((float)$value);
 					break;
 					
 				case self::CONFIG_KEY_SERVER:
