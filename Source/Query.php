@@ -2,9 +2,16 @@
 namespace SeTaco;
 
 
+use Facebook\WebDriver\Exception\ElementNotVisibleException;
+use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverSearchContext;
 
+use SeTaco\Exceptions\Element\DomElementNotVisibleException;
+use SeTaco\Exceptions\Element\ElementException;
+use SeTaco\Exceptions\Element\ElementObstructedException;
+use SeTaco\Exceptions\Query\QueriedElementNotClickableException;
+use SeTaco\Exceptions\QueryException;
 use SeTaco\Query\ISelector;
 use SeTaco\Config\QueryConfig;
 use SeTaco\Exceptions\Query\ElementNotFoundException;
@@ -60,6 +67,68 @@ class Query implements IQuery
 	{
 		$selector = $this->getSelector($query, $isCaseSensitive);
 		return $this->queryAllBySelector($selector, $timeout);
+	}
+	
+	/** @noinspection PhpInconsistentReturnPointsInspection */
+	private function executeRetryCallback(callable $c, ?float $timeout = null)
+	{
+		$timeout = $this->config->getTimeout($timeout);
+		$endTime = microtime(true) + $timeout;
+		
+		while (true)
+		{
+			try
+			{
+				return $c(min(0.0, $endTime - microtime(true)));
+			}
+			catch (WebDriverException $wde)
+			{
+				$e = $wde;
+			}
+			catch (ElementException $ee)
+			{
+				$e = $ee;
+			}
+			catch (QueryException $qe)
+			{
+				$e = $qe;
+			}
+			
+			if (microtime(true) > $endTime)
+				throw $e;
+			
+			usleep(50000);
+		}
+	}
+	
+	private function unsafeClickElement(string $query, bool $isCaseSensitive, IDomElement $e)
+	{
+		$selector = $this->getSelector($query, $isCaseSensitive);
+		
+		try
+		{
+			$e->click();
+		}
+		catch (DomElementNotVisibleException $ev)
+		{
+			throw new QueriedElementNotClickableException($selector, $ev->getMessage());
+		}
+		catch (ElementObstructedException $eo)
+		{
+			throw new QueriedElementNotClickableException($selector, $eo->getMessage());
+		}
+	}
+	
+	private function unsafeClick(callable $search, string $query, ?float $timeout, bool $isCaseSensitive)
+	{
+		$this->executeRetryCallback(
+			function(float $timeout)
+				use ($search, $query, $isCaseSensitive)
+			{
+				$el = $search($query, $timeout, $isCaseSensitive);
+				$this->unsafeClickElement($query, $isCaseSensitive, $el);
+			},
+			$timeout);
 	}
 	
 	
@@ -166,12 +235,24 @@ class Query implements IQuery
 	
 	public function click(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
-		$this->find($query, $timeout, $isCaseSensitive)->click();
+		$this->unsafeClick(
+			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
+			{
+				return $this->find($query, $timeout, $isCaseSensitive);
+			},
+			$query, $timeout, $isCaseSensitive
+		);
 	}
 	
 	public function clickAny(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
-		$this->findFirst($query, $timeout, $isCaseSensitive)->click();
+		$this->unsafeClick(
+			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
+			{
+				return $this->findFirst($query, $timeout, $isCaseSensitive);
+			},
+			$query, $timeout, $isCaseSensitive
+		);
 	}
 	
 	public function hover(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
@@ -186,11 +267,25 @@ class Query implements IQuery
 	
 	public function hoverAndClick(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
-		$this->find($query, $timeout, $isCaseSensitive)->hover()->click();
+		$this->unsafeClick(
+			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
+			{
+				$el = $this->find($query, $timeout, $isCaseSensitive)->hover();
+				return $el;
+			},
+			$query, $timeout, $isCaseSensitive
+		);
 	}
 	
 	public function hoverAndClickAny(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
-		$this->findFirst($query, $timeout, $isCaseSensitive)->hover()->click();
+		$this->unsafeClick(
+			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
+			{
+				$el = $this->findFirst($query, $timeout, $isCaseSensitive)->hover();
+				return $el;
+			},
+			$query, $timeout, $isCaseSensitive
+		);
 	}
 }

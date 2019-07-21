@@ -9,6 +9,6 @@ class DomElementNotVisibleException extends ElementException
 {
 	public function __construct(?ElementNotVisibleException $e = null)
 	{
-		parent::__construct('Element is not clickable', 0, $e);
+		parent::__construct('Element is not visible', 0, $e);
 	}
 }
