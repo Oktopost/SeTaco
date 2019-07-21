@@ -8,7 +8,6 @@ use Objection\LiteSetup;
 use Objection\LiteObject;
 
 use SeTaco\Query\DefaultSetup;
-
 use SeTaco\Config\Mapper;
 use SeTaco\Config\ServerConfig;
 use SeTaco\Config\TargetConfig;
@@ -32,6 +31,13 @@ class TacoConfig extends LiteObject
 			'Query'		=> LiteSetup::createInstanceOf(QueryConfig::class),
 			'Targets'	=> LiteSetup::createInstanceArray(TargetConfig::class),
 		];
+	}
+	
+	
+	public function __construct()
+	{
+		parent::__construct();
+		$this->Query = new QueryConfig();
 	}
 	
 	

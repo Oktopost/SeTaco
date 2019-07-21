@@ -2,8 +2,11 @@
 namespace SeTaco;
 
 
-use SeTaco\Exceptions\Element\MissingAttributeException;
 use Facebook\WebDriver\Remote\RemoteWebElement;
+use Facebook\WebDriver\Exception\WebDriverException;
+
+use SeTaco\Exceptions\FacebookExceptionParser;
+use SeTaco\Exceptions\Element\MissingAttributeException;
 
 
 class DomElement implements IDomElement
@@ -30,10 +33,17 @@ class DomElement implements IDomElement
 	
 	public function click(bool $hover = false): IDomElement
 	{
-		if ($hover)
-			$this->hover();
-		
-		$this->element->click();
+		try
+		{
+			if ($hover)
+				$this->hover();
+			
+			$this->element->click();
+		}
+		catch (WebDriverException $e)
+		{
+			FacebookExceptionParser::parseElementException($e);
+		}
 		
 		return $this;
 	}
@@ -48,22 +58,34 @@ class DomElement implements IDomElement
 		return $this;
 	}
 	
-	public function input(string $input): IDomElement
+	public function input(string $input, bool $clear = false): IDomElement
 	{
-		$this->element->clear();
-		$this->element->sendKeys($input);
-		return $this;
-	}
-	
-	public function appendInput(string $input): IDomElement
-	{
-		$this->element->sendKeys($input);
+		try
+		{
+			if ($clear)
+				$this->element->clear();
+			
+			$this->element->sendKeys($input);
+		}
+		catch (WebDriverException $e)
+		{
+			FacebookExceptionParser::parseElementException($e);
+		}
+		
 		return $this;
 	}
 	
 	public function clear(): IDomElement
 	{
-		$this->element->clear();
+		try
+		{
+			$this->element->clear();
+		}
+		catch (WebDriverException $e)
+		{
+			FacebookExceptionParser::parseElementException($e);
+		}
+		
 		return $this;
 	}
 	
@@ -74,7 +96,17 @@ class DomElement implements IDomElement
 	
 	public function getAttribute(string $name, bool $allowMissing = true): ?string
 	{
-		$value = $this->element->getAttribute($name);
+		$value = null;
+		
+		try
+		{
+			$value = $this->element->getAttribute($name);
+		}
+		catch (WebDriverException $e)
+		{
+			FacebookExceptionParser::parseElementException($e);
+		}
+		
 		
 		if (is_null($value) && !$allowMissing)
 			throw new MissingAttributeException($name);

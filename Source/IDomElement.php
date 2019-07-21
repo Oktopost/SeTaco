@@ -12,8 +12,7 @@ interface IDomElement
 	public function hover(): IDomElement;
 	public function query(): IQuery;
 	
-	public function input(string $input): IDomElement;
-	public function appendInput(string $input): IDomElement;
+	public function input(string $input, bool $clear = false): IDomElement;
 	public function clear(): IDomElement; 
 	
 	public function getName(bool $allowMissing = true): ?string;
