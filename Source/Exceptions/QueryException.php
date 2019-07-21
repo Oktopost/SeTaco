@@ -11,14 +11,7 @@ class QueryException extends SeTacoException
 	private $selector;
 	
 	
-	public function __construct(ISelector $selector, string $message)
-	{
-		parent::__construct($message);
-		$this->selector = $selector;
-	}
-	
-	
-	public function getSelectorAsString(string $tabulation = '', string $newLine = PHP_EOL): string
+	private function getSelectorAsString(string $tabulation = '', string $newLine = PHP_EOL): string
 	{
 		$original	= $this->selector->originalQuery();
 		$generated	= $this->selector->query();
@@ -39,12 +32,19 @@ class QueryException extends SeTacoException
 		return $message;
 	}
 	
-	public function __toString()
+	public function generateMessage(string $message)
 	{
-		$message = $this->getMessage() . PHP_EOL;
+		$message = $message . PHP_EOL;
 		$message .= $this->getSelectorAsString("\t");
 		$message .= $this->getTraceAsString();
 		
 		return $message;
+	}
+	
+	
+	public function __construct(ISelector $selector, string $message)
+	{
+		$this->selector = $selector;
+		parent::__construct($this->generateMessage($message));
 	}
 }

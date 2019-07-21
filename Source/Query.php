@@ -2,21 +2,24 @@
 namespace SeTaco;
 
 
-use Facebook\WebDriver\Exception\ElementNotVisibleException;
-use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverSearchContext;
+use Facebook\WebDriver\Exception\WebDriverException;
 
-use SeTaco\Exceptions\Element\DomElementNotVisibleException;
-use SeTaco\Exceptions\Element\ElementException;
-use SeTaco\Exceptions\Element\ElementObstructedException;
-use SeTaco\Exceptions\Query\QueriedElementNotClickableException;
-use SeTaco\Exceptions\QueryException;
+use SeTaco\Exceptions\Element\ElementNotEditableException;
 use SeTaco\Query\ISelector;
 use SeTaco\Config\QueryConfig;
+
+use SeTaco\Exceptions\Element\ElementException;
+use SeTaco\Exceptions\Element\ElementObstructedException;
+use SeTaco\Exceptions\Element\DomElementNotVisibleException;
+
+use SeTaco\Exceptions\QueryException;
 use SeTaco\Exceptions\Query\ElementNotFoundException;
 use SeTaco\Exceptions\Query\ElementStillExistsException;
 use SeTaco\Exceptions\Query\MultipleElementsExistException;
+use SeTaco\Exceptions\Query\QueriedElementNotEditableException;
+use SeTaco\Exceptions\Query\QueriedElementNotClickableException;
 
 
 class Query implements IQuery
@@ -79,7 +82,7 @@ class Query implements IQuery
 		{
 			try
 			{
-				return $c(min(0.0, $endTime - microtime(true)));
+				return $c(max(0.0, $endTime - microtime(true)));
 			}
 			catch (WebDriverException $wde)
 			{
@@ -116,6 +119,28 @@ class Query implements IQuery
 		catch (ElementObstructedException $eo)
 		{
 			throw new QueriedElementNotClickableException($selector, $eo->getMessage());
+		}
+	}
+	
+	private function unsafeInputElement(string $query, bool $isCaseSensitive, IDomElement $e, $value)
+	{
+		$selector = $this->getSelector($query, $isCaseSensitive);
+		
+		try
+		{
+			$e->input($value);
+		}
+		catch (ElementNotEditableException $eee)
+		{
+			throw new QueriedElementNotEditableException($selector, $eee->getMessage());
+		}
+		catch (DomElementNotVisibleException $ev)
+		{
+			throw new QueriedElementNotEditableException($selector, $ev->getMessage());
+		}
+		catch (ElementObstructedException $eo)
+		{
+			throw new QueriedElementNotEditableException($selector, $eo->getMessage());
 		}
 	}
 	
@@ -230,7 +255,14 @@ class Query implements IQuery
 	
 	public function input(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
-		$this->find($query, $timeout, $isCaseSensitive)->input($value);
+		$this->executeRetryCallback(
+			function(float $timeout)
+				use ($query, $isCaseSensitive, $value)
+			{
+				$el = $this->find($query, $timeout, $isCaseSensitive);
+				$this->unsafeInputElement($query, $isCaseSensitive, $el, $value);
+			},
+			$timeout);
 	}
 	
 	public function click(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void

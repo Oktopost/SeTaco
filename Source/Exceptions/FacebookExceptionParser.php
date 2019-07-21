@@ -3,6 +3,7 @@ namespace SeTaco\Exceptions;
 
 
 use Facebook\WebDriver\Exception\InvalidElementStateException;
+use Facebook\WebDriver\Exception\UnrecognizedExceptionException;
 use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Exception\UnknownServerException;
 use Facebook\WebDriver\Exception\ElementNotVisibleException;
@@ -35,6 +36,18 @@ class FacebookExceptionParser
 		}
 	}
 	
+	private static function handleUnrecognized(UnrecognizedExceptionException $u)
+	{
+		if (Strings::contains($u->getMessage(), 'element not interactable'))
+		{
+			throw new ElementNotEditableException();
+		}
+		else
+		{
+			throw new SeTacoException('Unexpected UnknownServerException exception', 0, $u);
+		}
+	}
+	
 	private static function handleInvalidState(InvalidElementStateException $i)
 	{
 		if (Strings::contains($i->getMessage(), 'Element must be user-editable in order to clear it'))
@@ -57,6 +70,10 @@ class FacebookExceptionParser
 		else if ($t instanceof UnknownServerException)
 		{
 			self::handleUnknown($t);
+		} 
+		else if ($t instanceof UnrecognizedExceptionException)
+		{
+			self::handleUnrecognized($t);
 		}
 		else if ($t instanceof InvalidElementStateException)
 		{
