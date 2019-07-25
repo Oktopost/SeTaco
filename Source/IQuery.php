@@ -10,6 +10,7 @@ interface IQuery
 {
 	public function exists(string $query, ?float $timeout = null, bool $isCaseSensitive = false): bool;
 	public function count(string $query, ?float $timeout = null, bool $isCaseSensitive = false): int;
+	public function text(string $query, ?float $timeout = null, bool $isCaseSensitive = false): string;
 	
 	public function find(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement;
 	public function findFirst(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement;

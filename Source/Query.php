@@ -178,6 +178,11 @@ class Query implements IQuery
 		return $this->findAll($query, $timeout, $isCaseSensitive)->count();
 	}
 	
+	public function text(string $query, ?float $timeout = null, bool $isCaseSensitive = false): string
+	{
+		return $this->find($query, $timeout, $isCaseSensitive)->getRemoteWebElement()->getText();
+	}
+	
 	public function find(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
 		$selector = $this->getSelector($query, $isCaseSensitive);
