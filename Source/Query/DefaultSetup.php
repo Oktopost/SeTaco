@@ -4,8 +4,10 @@ namespace SeTaco\Query;
 
 use SeTaco\Config\QueryConfig;
 use SeTaco\Query\Resolvers\ByContentResolver;
+use SeTaco\Query\Resolvers\ExactTextResolver;
 use SeTaco\Query\Resolvers\ByAttributeResolver;
 use SeTaco\Query\Resolvers\AbstractResolveHelper;
+
 use Traitor\TStaticClass;
 
 
@@ -18,6 +20,8 @@ class DefaultSetup
 	{
 		$config->addResolver('attr', new ByAttributeResolver());
 		$config->addResolver(['txt', 'content'], new ByContentResolver());
+		
+		$config->addResolver(['etxt'], new ExactTextResolver());
 		
 		$config->addResolver('placeholder', function(string $query, bool $isCaseSensitive)
 		{
