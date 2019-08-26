@@ -8,8 +8,8 @@ use Composer\Script\Event;
 class ComposerUtils
 {
 	private const SELENIUM_URL = 'https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar';
-	private const CHROME_LINUX = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip';
-	private const CHROME_DARWIN = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_mac64.zip';
+	private const CHROME_LINUX = 'https://chromedriver.storage.googleapis.com/76.0.3809.68/chromedriver_linux64.zip';
+	private const CHROME_DARWIN = 'https://chromedriver.storage.googleapis.com/76.0.3809.68/chromedriver_mac64.zip';
 	
 	
 	private static function getVendorDir(Event $event): string
