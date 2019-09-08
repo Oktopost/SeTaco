@@ -61,7 +61,15 @@ class ComposerUtils
 	
 	private static function copySeleniumSH(string $binPath): void
 	{
-		shell_exec('cp Source/Utils/selenium.sh ' . $binPath);
+		if (is_dir('Source/Utils'))
+		{
+			shell_exec('cp Source/Utils/selenium.sh ' . $binPath);
+		}
+		else
+		{
+			shell_exec('cp vendor/oktopost/se-taco/Source/Utils/selenium.sh ' . $binPath);
+		}
+		
 		shell_exec('chmod +x ' . $binPath . '/selenium.sh');
 	}
 	
