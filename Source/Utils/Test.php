@@ -31,29 +31,40 @@ class Test
 		shell_exec('./vendor/bin/selenium.sh start');
 	}
 	
-	private static  function stopSelenium(): void
+	private static function stopSelenium(): void
 	{
 		echo "\nStopping selenium instance\n";
 		shell_exec('./vendor/bin/selenium.sh stop');
 	}
 	
+	private static function combineArgs(Event $event, ?array $arguments = []): array
+	{
+		$evArgs = [implode(' ', $event->getArguments())];
+		return array_filter(array_unique(array_merge(['--dont-report-useless-tests'], $evArgs, $arguments)));
+	}
+	
 	
 	public static function test(Event $event, ?array $arguments = []): void
 	{
-		$evArgs = [implode(' ', $event->getArguments())];
-		
-		$arguments = array_filter(array_unique(array_merge(['--dont-report-useless-tests'], $evArgs, $arguments)));
+		$arguments = self::combineArgs($event, $arguments);
 		
 		if (!self::checkSelenium())
 			self::startSelenium();
 		
-		$exec = './vendor/phpunit/phpunit/phpunit ' . implode(' ', $arguments);
-		
-		echo $exec;
+		$exec = './vendor/phpunit/phpunit/phpunit ' . implode(' ', $arguments) . ' 1>&2';
 		
 		shell_exec($exec);
 		
 		self::stopSelenium();
+	}
+	
+	public static function testWithoutSelenium(Event $event): void
+	{
+		$arguments = self::combineArgs($event);
+		
+		$exec = './vendor/phpunit/phpunit/phpunit ' . implode(' ', $arguments) . ' 1>&2';
+		
+		shell_exec($exec);
 	}
 	
 	public static function unitTest(Event $event): void
