@@ -41,15 +41,15 @@
     "scripts": 
 	{
 		"post-install-cmd": [
-			"SeTaco\\Downloads\\ComposerUtils::composerPostInstallHook"
+			"SeTaco\\Utils\\ComposerUtils::composerPostInstallHook"
 		],
 		"selenium": "java -Dwebdriver.chrome.driver=\"vendor/bin/chromedriver\" -jar vendor/bin/selenium.jar",
-        "test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests",
-        "unit-test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --group unit",
-        "integration-test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --group integration",
-        "test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover",
-        "unit-test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover --group unit",
-        "integration-test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover --group integration"
+		"test": "SeTaco\\Utils\\Test::test",
+        "unit-test": "SeTaco\\Utils\\Test::unitTest",
+        "integration-test": "SeTaco\\Utils\\Test::integrationTest",
+        "test-cover": "SeTaco\\Utils\\Test::testCover",
+        "unit-test-cover": "SeTaco\\Utils\\Test::unitTestCover",
+        "integration-test-cover": "SeTaco\\Utils\\Test::integrationTestCover"
     },
 	"config": {
 		"process-timeout": 0

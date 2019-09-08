@@ -1,5 +1,5 @@
 <?php
-namespace SeTaco\Downloads;
+namespace SeTaco\Utils;
 
 
 use Composer\Script\Event;
@@ -59,11 +59,18 @@ class ComposerUtils
 		shell_exec("rm " . $filename);
 	}
 	
+	private static function copySeleniumSH(string $binPath): void
+	{
+		shell_exec('cp Source/Utils/selenium.sh ' . $binPath);
+		shell_exec('chmod +x ' . $binPath . '/selenium.sh');
+	}
+	
 	
 	public static function composerPostInstallHook(Event $event): void
 	{
 		$path = self::getBinDirPath($event);
 		self::downloadSelenium($path);
 		self::downloadChromeDriver($path);
+		self::copySeleniumSH($path);
 	}
 }
