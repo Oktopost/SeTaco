@@ -8,7 +8,7 @@ use SeTaco\Exceptions\QueryException;
 
 class QueriedElementNotClickableException extends QueryException
 {
-	public function __construct(ISelector $selector, string $message)
+	public function __construct($selector, string $message)
 	{
 		parent::__construct($selector, "Element is not clickable because: $message");
 	}

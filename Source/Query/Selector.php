@@ -2,6 +2,8 @@
 namespace SeTaco\Query;
 
 
+use Facebook\WebDriver\WebDriverElement;
+use Facebook\WebDriver\WebDriverSearchContext;
 use SeTaco\IQueryResolver;
 use SeTaco\Exceptions\FatalSeTacoException;
 use Facebook\WebDriver\WebDriverBy;
@@ -84,6 +86,15 @@ class Selector implements ISelector
 			default:
 				throw new FatalSeTacoException("Unexpected selector type: {$this->type}");
 		}
+	}
+	
+	/**
+	 * @param WebDriverSearchContext $context
+	 * @return WebDriverElement[]
+	 */
+	public function searchIn(WebDriverSearchContext $context): array
+	{
+		return $context->findElements($this->getDriverSelector());
 	}
 	
 	

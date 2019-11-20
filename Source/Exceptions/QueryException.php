@@ -3,20 +3,21 @@ namespace SeTaco\Exceptions;
 
 
 use SeTaco\Query\ISelector;
+use Structura\Arrays;
 
 
 class QueryException extends SeTacoException
 {
 	/** @var ISelector */
-	private $selector;
+	private $selectors;
 	
 	
-	private function getSelectorAsString(string $tabulation = '', string $newLine = PHP_EOL): string
+	private function getSelectorAsString(ISelector $selector, string $tabulation = '', string $newLine = PHP_EOL): string
 	{
-		$original	= $this->selector->originalQuery();
-		$generated	= $this->selector->query();
-		$type		= $this->selector->type();
-		$resolver	= $this->selector->resolver();
+		$original	= $selector->originalQuery();
+		$generated	= $selector->query();
+		$type		= $selector->type();
+		$resolver	= $selector->resolver();
 		
 		$message = '';
 		$message .= $tabulation . "String: $original"	. $newLine;
@@ -32,19 +33,43 @@ class QueryException extends SeTacoException
 		return $message;
 	}
 	
+	private function getSelectorsAsString(string $tabulation, string $newLine = PHP_EOL): string
+	{
+		if (count($this->selectors) == 1)
+		{
+			return $this->getSelectorAsString($this->selectors[0]);
+		}
+		else
+		{
+			$message = '';
+			$num = 1;
+			
+			foreach ($this->selectors as $selector)
+			{
+				$message .= "Select $num: $newLine";
+				$message .= $this->getSelectorAsString($selector, "{$tabulation}{$tabulation}", $newLine);
+				$message .= "{$tabulation}{$tabulation}{$newLine}";
+				
+				$num++;
+			}
+			
+			return $message;
+		}
+	}
+	
 	public function generateMessage(string $message)
 	{
 		$message = $message . PHP_EOL;
-		$message .= $this->getSelectorAsString("\t");
+		$message .= $this->getSelectorsAsString("\t");
 		$message .= $this->getTraceAsString();
 		
 		return $message;
 	}
 	
 	
-	public function __construct(ISelector $selector, string $message)
+	public function __construct($selector, string $message)
 	{
-		$this->selector = $selector;
+		$this->selectors = array_values(Arrays::toArray($selector));
 		parent::__construct($this->generateMessage($message));
 	}
 }

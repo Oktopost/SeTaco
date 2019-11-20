@@ -118,4 +118,23 @@ class DomElement implements IDomElement
 	{
 		return new Query($this->setup, $this->element);
 	}
+	
+	
+	/**
+	 * @param RemoteWebElement[] $elements
+	 * @param BrowserSetup $setup
+	 * @return DomElement[]
+	 */
+	public static function convertAll(array $elements, BrowserSetup $setup): array
+	{
+		$domElements = [];
+		
+		/** @var RemoteWebElement[] $elements */
+		foreach ($elements as $element)
+		{
+			$domElements[] = new DomElement($element, $setup);
+		}
+		
+		return $domElements;
+	}
 }

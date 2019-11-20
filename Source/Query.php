@@ -21,6 +21,7 @@ use SeTaco\Exceptions\Query\ElementStillExistsException;
 use SeTaco\Exceptions\Query\MultipleElementsExistException;
 use SeTaco\Exceptions\Query\QueriedElementNotEditableException;
 use SeTaco\Exceptions\Query\QueriedElementNotClickableException;
+use Structura\Arrays;
 
 
 class Query implements IQuery
@@ -40,42 +41,76 @@ class Query implements IQuery
 		return $this->config->resolve($query, $isCaseSensitive);
 	}
 	
-	private function queryAllBySelector(ISelector $selector, ?float $timeout = null): IDomElementsCollection
+	/**
+	 * @param string|string[] $query
+	 * @param bool $isCaseSensitive
+	 * @return ISelector[]
+	 */
+	private function getSelectors($query, bool $isCaseSensitive = false): array
 	{
-		$timeout = $this->config->getTimeout($timeout);
-		$endTime = microtime(true) + $timeout;
+		$selectors = [];
 		
-		$searchObject = $selector->getDriverSelector();
-		$elements = $this->context->findElements($searchObject);
+		foreach (Arrays::toArray($query) as $item)
+		{
+			if ($item instanceof ISelector)
+			{
+				$selectors[] = $item;
+			}
+			else
+			{
+				$selectors[] = $this->getSelector($item, $isCaseSensitive);
+			}
+		}
+		
+		return $selectors;
+	}
+	
+	/**
+	 * @param ISelector|ISelector[] $selectors
+	 * @return array
+	 */
+	private function getAllElements($selectors): array
+	{
+		$allElements = [];
+		
+		foreach ($selectors as $selector)
+		{
+			$driverSelector = $selector->getDriverSelector();
+			$elements = $this->context->findElements($driverSelector);
+			
+			$allElements = array_merge($allElements, $elements);
+		}
+		
+		return $allElements;
+	}
+	
+	/**
+	 * @param string|string[]|ISelector|ISelector[] $query
+	 * @param float|null $timeout
+	 * @param bool $isCaseSensitive
+	 * @return IDomElementsCollection
+	 */
+	private function queryAll($query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElementsCollection
+	{
+		$selectors = $this->getSelectors($query, $isCaseSensitive);
+		$endTime = $this->config->getWaitUntil($timeout);
+		
+		$elements = $this->getAllElements($selectors);
 		
 		while (!$elements && microtime(true) < $endTime)
 		{
-			usleep(50000);
-			$elements = $this->context->findElements($searchObject);
+			$elements = $this->getAllElements($selectors);
 		}
 		
-		$domElements = [];
-		
-		/** @var RemoteWebElement[] $elements */
-		foreach ($elements as $element)
-		{
-			$domElements[] = new DomElement($element, $this->setup);
-		}
+		$domElements = DomElement::convertAll($elements, $this->setup);
 		
 		return new DomElementsCollection($domElements);
-	}
-	
-	private function queryAll(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElementsCollection
-	{
-		$selector = $this->getSelector($query, $isCaseSensitive);
-		return $this->queryAllBySelector($selector, $timeout);
 	}
 	
 	/** @noinspection PhpInconsistentReturnPointsInspection */
 	private function executeRetryCallback(callable $c, ?float $timeout = null)
 	{
-		$timeout = $this->config->getTimeout($timeout);
-		$endTime = microtime(true) + $timeout;
+		$endTime = $this->config->getWaitUntil($timeout);
 		
 		while (true)
 		{
@@ -103,7 +138,7 @@ class Query implements IQuery
 		}
 	}
 	
-	private function unsafeClickElement(string $query, bool $isCaseSensitive, IDomElement $e)
+	private function unsafeClickElement($query, bool $isCaseSensitive, IDomElement $e)
 	{
 		$selector = $this->getSelector($query, $isCaseSensitive);
 		
@@ -143,7 +178,7 @@ class Query implements IQuery
 		}
 	}
 	
-	private function unsafeClick(callable $search, string $query, ?float $timeout, bool $isCaseSensitive)
+	private function unsafeClick(callable $search, $query, ?float $timeout, bool $isCaseSensitive)
 	{
 		$this->executeRetryCallback(
 			function(float $timeout)
@@ -168,10 +203,47 @@ class Query implements IQuery
 	
 	public function exists(string $query, ?float $timeout = null, bool $isCaseSensitive = false): bool
 	{
-		return !$this->findAll($query, $timeout, $isCaseSensitive)->isEmpty();
+		return $this->existsAll([$query], $timeout, $isCaseSensitive);
 	}
 	
-	public function count(string $query, ?float $timeout = null, bool $isCaseSensitive = false): int
+	public function existsAny(array $query, ?float $timeout = null, bool $isCaseSensitive = false): bool
+	{
+		$endTime = $this->config->getWaitUntil($timeout);
+		
+		while (microtime(true) < $endTime)
+		{
+			foreach ($query as $item)
+			{
+				if ($this->findAll($item, 0.0, $isCaseSensitive))
+				{
+					return true;
+				}
+			}
+			
+			usleep(50000);
+		}
+		
+		return false;
+	}
+	
+	public function existsAll(array $query, ?float $timeout = null, bool $isCaseSensitive = false): bool
+	{
+		$endTime = $this->config->getWaitUntil($timeout);
+		
+		foreach ($query as $item)
+		{
+			$timeout = max(0.0, microtime(true) - $endTime);
+			
+			if (!$this->findAll($item, $timeout, $isCaseSensitive))
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public function count($query, ?float $timeout = null, bool $isCaseSensitive = false): int
 	{
 		return $this->findAll($query, $timeout, $isCaseSensitive)->count();
 	}
@@ -184,7 +256,7 @@ class Query implements IQuery
 	public function find(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
 		$selector = $this->getSelector($query, $isCaseSensitive);
-		$all = $this->queryAllBySelector($selector, $timeout);
+		$all = $this->queryAll($query, $timeout, $isCaseSensitive);
 		
 		if ($all->isOne())
 		{
@@ -200,10 +272,10 @@ class Query implements IQuery
 		}
 	}
 	
-	public function findFirst(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
+	public function findFirst($query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
 		$selector = $this->getSelector($query, $isCaseSensitive);
-		$all = $this->queryAllBySelector($selector, $timeout);
+		$all = $this->queryAll($selector, $timeout);
 		
 		if (!$all->hasAny())
 			throw new ElementNotFoundException($selector);
@@ -211,7 +283,7 @@ class Query implements IQuery
 		return $all->first();
 	}
 	
-	public function findAll(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElementsCollection
+	public function findAll($query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElementsCollection
 	{
 		return $this->queryAll($query, $timeout, $isCaseSensitive);
 	}
@@ -222,38 +294,84 @@ class Query implements IQuery
 		return $all->isOne() ? $all->first() : null; 
 	}
 	
-	public function tryFindFirst(string $query, ?float $timeout = null, bool $isCaseSensitive = false): ?IDomElement
+	public function tryFindFirst($query, ?float $timeout = null, bool $isCaseSensitive = false): ?IDomElement
 	{
 		return $this->queryAll($query, $timeout, $isCaseSensitive)->first();
 	}
 
-	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForElement($query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
 		$this->find($query, $timeout, $isCaseSensitive);
 	}
 	
-	public function waitForElements(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
 		$this->findAll($query, $timeout, $isCaseSensitive);
 	}
 	
+	public function waitForAllElements(array $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	{
+		$endTime = $this->config->getWaitUntil($timeout);
+		
+		foreach ($query as $item)
+		{
+			$this->findAll($item, max(0.0, microtime(true) - $endTime), $isCaseSensitive);
+		}
+	}
+	
 	public function waitToDisappear(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
+		$this->waitAllToDisappear($query, $timeout, $isCaseSensitive);
+	}
+	
+	public function waitAllToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	{
 		$timeout = $this->config->getTimeout($timeout);
-		$endTime = microtime(true) + $timeout;
+		$endTime = $this->config->getWaitUntil($timeout);
 		
-		$selector = $this->getSelector($query, $isCaseSensitive);
-		$searchObject = $selector->getDriverSelector();
-		$elements = $this->context->findElements($searchObject);
+		$originalSelectors = $this->getSelectors($query, $isCaseSensitive);
+		$selectors = $originalSelectors;
+		$selector = array_shift($selectors);
 		
-		while ($elements && microtime(true) < $endTime)
+		while ($selector && microtime(true) < $endTime)
 		{
-			if (microtime(true) >= $endTime)
-				throw new ElementStillExistsException($selector, $timeout);
+			if ($selector->searchIn($this->context))
+			{
+				$selector = array_shift($selectors);
+			}
+			else
+			{
+				usleep(50000);
+			}
+		}
+		
+		if ($selector && microtime(true) >= $endTime)
+		{
+			throw new ElementStillExistsException($originalSelectors, $timeout);
+		}
+	}
+	
+	public function waitAnyToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	{
+		$timeout = $this->config->getTimeout($timeout);
+		$endTime = $this->config->getWaitUntil($timeout);
+		
+		$selectors = $this->getSelectors($query, $isCaseSensitive);
+		
+		while (microtime(true) < $endTime)
+		{
+			foreach ($selectors as $selector)
+			{
+				if (!$selector->searchIn($this->context))
+				{
+					return;
+				}
+			}
 			
 			usleep(50000);
-			$elements = $this->context->findElements($searchObject);
 		}
+		
+		throw new ElementStillExistsException($selectors, $timeout);
 	}
 	
 	public function input(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void
@@ -279,10 +397,10 @@ class Query implements IQuery
 		);
 	}
 	
-	public function clickAny(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function clickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
 		$this->unsafeClick(
-			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
+			function ($query, ?float $timeout = null, bool $isCaseSensitive = false)
 			{
 				return $this->findFirst($query, $timeout, $isCaseSensitive);
 			},
@@ -295,7 +413,7 @@ class Query implements IQuery
 		$this->find($query, $timeout, $isCaseSensitive)->hover();
 	}
 	
-	public function hoverAny(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function hoverAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
 		$this->findFirst($query, $timeout, $isCaseSensitive)->hover();
 	}
@@ -312,10 +430,10 @@ class Query implements IQuery
 		);
 	}
 	
-	public function hoverAndClickAny(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function hoverAndClickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
 		$this->unsafeClick(
-			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
+			function ($query, ?float $timeout = null, bool $isCaseSensitive = false)
 			{
 				$el = $this->findFirst($query, $timeout, $isCaseSensitive)->hover();
 				return $el;
