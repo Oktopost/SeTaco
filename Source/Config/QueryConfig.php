@@ -178,6 +178,6 @@ class QueryConfig
 	
 	public function getWaitUntil(?float $given): float
 	{
-		return microtime() + (is_null($given) ? $this->defaultTimeout : $given);
+		return microtime(true) + (is_null($given) ? $this->defaultTimeout : $given);
 	}
 }

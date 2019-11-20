@@ -214,7 +214,7 @@ class Query implements IQuery
 		{
 			foreach ($query as $item)
 			{
-				if ($this->findAll($item, 0.0, $isCaseSensitive))
+				if (!$this->findAll($item, 0.0, $isCaseSensitive)->isEmpty())
 				{
 					return true;
 				}
@@ -234,7 +234,7 @@ class Query implements IQuery
 		{
 			$timeout = max(0.0, microtime(true) - $endTime);
 			
-			if (!$this->findAll($item, $timeout, $isCaseSensitive))
+			if ($this->findAll($item, $timeout, $isCaseSensitive)->isEmpty())
 			{
 				return false;
 			}
@@ -335,7 +335,7 @@ class Query implements IQuery
 		
 		while ($selector && microtime(true) < $endTime)
 		{
-			if ($selector->searchIn($this->context))
+			if (!$selector->searchIn($this->context))
 			{
 				$selector = array_shift($selectors);
 			}
