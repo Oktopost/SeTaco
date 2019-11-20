@@ -335,15 +335,24 @@ class Query implements IQuery
 		$selectors = $originalSelectors;
 		$selector = array_shift($selectors);
 		
-		while ($selector && microtime(true) < $endTime)
+		while (true)
 		{
-			if (!$selector->searchIn($this->context))
+			while ($selector)
 			{
-				$selector = array_shift($selectors);
+				if (!$selector->searchIn($this->context))
+				{
+					$selector = array_shift($selectors);
+				}
+				else
+				{
+					usleep(50000);
+					break;
+				}
 			}
-			else
+			
+			if (microtime(true) >= $endTime)
 			{
-				usleep(50000);
+				break;
 			}
 		}
 		
@@ -360,7 +369,7 @@ class Query implements IQuery
 		
 		$selectors = $this->getSelectors($query, $isCaseSensitive);
 		
-		while (microtime(true) < $endTime)
+		while (true)
 		{
 			foreach ($selectors as $selector)
 			{
@@ -371,6 +380,11 @@ class Query implements IQuery
 			}
 			
 			usleep(50000);
+			
+			if (microtime(true) >= $endTime)
+			{
+				break;
+			}
 		}
 		
 		throw new ElementStillExistsException($selectors, $timeout);

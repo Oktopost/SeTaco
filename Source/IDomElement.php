@@ -16,6 +16,7 @@ interface IDomElement
 	public function clear(): IDomElement; 
 	
 	public function getText(): string;
+	public function getValue(bool $allowMissing = true): ?string;
 	public function getName(bool $allowMissing = true): ?string;
 	public function getAttribute(string $name, bool $allowMissing = true): ?string;
 }

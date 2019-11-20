@@ -44,14 +44,6 @@
 			"SeTaco\\Utils\\ComposerUtils::composerPostInstallHook"
 		],
 		"selenium": "java -Dwebdriver.chrome.driver=\"vendor/bin/chromedriver\" -jar vendor/bin/selenium.jar",
-		"test": "SeTaco\\Utils\\Test::test",
-        "unit-test": "SeTaco\\Utils\\Test::unitTest",
-        "integration-test": "SeTaco\\Utils\\Test::integrationTest",
-        "test-cover": "SeTaco\\Utils\\Test::testCover",
-        "unit-test-cover": "SeTaco\\Utils\\Test::unitTestCover",
-        "integration-test-cover": "SeTaco\\Utils\\Test::integrationTestCover"
-    },
-	"config": {
-		"process-timeout": 0
-	}
+		"test": "SeTaco\\Utils\\Test::test"
+    }
 }
