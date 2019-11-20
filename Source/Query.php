@@ -3,6 +3,7 @@ namespace SeTaco;
 
 
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverSearchContext;
 use Facebook\WebDriver\Exception\WebDriverException;
 
@@ -48,16 +49,17 @@ class Query implements IQuery
 		$endTime = microtime(true) + $timeout;
 		
 		$searchObject = $selector->getDriverSelector();
-		$elements = $this->driver->findElements($searchObject);
+		$elements = $this->context->findElements($searchObject);
 		
 		while (!$elements && microtime(true) < $endTime)
 		{
 			usleep(50000);
-			$elements = $this->driver->findElements($searchObject);
+			$elements = $this->context->findElements($searchObject);
 		}
 		
 		$domElements = [];
 		
+		/** @var RemoteWebElement[] $elements */
 		foreach ($elements as $element)
 		{
 			$domElements[] = new DomElement($element, $this->setup);
@@ -246,7 +248,7 @@ class Query implements IQuery
 		
 		$selector = $this->getSelector($query, $isCaseSensitive);
 		$searchObject = $selector->getDriverSelector();
-		$elements = $this->driver->findElements($searchObject);
+		$elements = $this->context->findElements($searchObject);
 		
 		while ($elements && microtime(true) < $endTime)
 		{
@@ -254,7 +256,7 @@ class Query implements IQuery
 				throw new ElementStillExistsException($selector, $timeout);
 			
 			usleep(50000);
-			$elements = $this->driver->findElements($searchObject);
+			$elements = $this->context->findElements($searchObject);
 		}
 	}
 	
