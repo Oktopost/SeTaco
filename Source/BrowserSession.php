@@ -184,7 +184,7 @@ class BrowserSession implements IBrowserSession
 	
 	public function close($browserName = null): void
 	{
-		if(!$browserName)
+		if (!$browserName)
 		{
 			foreach ($this->browsers as $browserName => $browser)
 			{
@@ -202,13 +202,13 @@ class BrowserSession implements IBrowserSession
 		}
 		else
 		{
-			if(!$this->hasBrowser($browserName))
+			if (!$this->hasBrowser($browserName))
 				return;
 			
 			$browser = $this->getBrowser($browserName);
 		}
 		
-		/** @noinspection PhpNonStrictObjectEqualityInspection */
+		
 		if ($browser == $this->current)
 			$this->current = null;
 		

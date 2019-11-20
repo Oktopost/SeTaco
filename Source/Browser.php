@@ -9,7 +9,7 @@ use Facebook\WebDriver\Cookie;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteKeyboard;
 
-use Structura\Arrays;
+use SeTaco\Utils\ShutdownFallback;
 use Structura\Strings;
 
 
@@ -25,6 +25,8 @@ class Browser extends Query implements IBrowser
 	{
 		parent::__construct($config, $config->RemoteWebDriver);
 		$this->config = $config;
+		
+		ShutdownFallback::addBrowser($this);
 	}
 	
 	public function __destruct()
@@ -141,6 +143,8 @@ class Browser extends Query implements IBrowser
 		
 		$this->isClosed = true;
 		$this->getRemoteWebDriver()->close();
+		
+		ShutdownFallback::removeBrowser($this);
 	}
 	
 	/**
