@@ -31,9 +31,6 @@ class Query implements IQuery
 	/** @var WebDriverSearchContext */
 	private $context;
 	
-	/** @var RemoteWebDriver */
-	private $driver;
-	
 	/** @var QueryConfig */
 	private $config;
 	
@@ -164,7 +161,6 @@ class Query implements IQuery
 		$this->setup = $setup;
 		
 		$this->config = $setup->QueryConfig;
-		$this->driver = $setup->RemoteWebDriver;
 		$this->context = $searchContext;
 	}
 	
