@@ -82,9 +82,9 @@ class BrowserSession implements IBrowserSession
 	}
 	
 	
-	public function __construct(TacoConfig $config)
+	public function __construct(?TacoConfig $config = null)
 	{
-		$this->config = $config;
+		$this->config = $config ?: TacoConfig::parse([]);
 	}
 	
 	public function __destruct()

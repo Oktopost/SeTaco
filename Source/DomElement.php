@@ -94,6 +94,11 @@ class DomElement implements IDomElement
 		return $this->getAttribute('name', $allowMissing);
 	}
 	
+	public function getText(): string
+	{
+		return $this->getRemoteWebElement()->getText();
+	}
+	
 	public function getAttribute(string $name, bool $allowMissing = true): ?string
 	{
 		$value = null;

@@ -19,8 +19,8 @@ interface IQuery
 	public function tryFind(string $query, ?float $timeout = null, bool $isCaseSensitive = false): ?IDomElement;
 	public function tryFindFirst($query, ?float $timeout = null, bool $isCaseSensitive = false): ?IDomElement;
 	
-	public function waitForElement($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	public function waitForAnyElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function waitForAllElements(array $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function waitToDisappear(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function waitAllToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void;

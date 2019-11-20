@@ -2,17 +2,15 @@
 namespace SeTaco;
 
 
-use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverSearchContext;
 use Facebook\WebDriver\Exception\WebDriverException;
 
-use SeTaco\Exceptions\Element\ElementNotEditableException;
 use SeTaco\Query\ISelector;
 use SeTaco\Config\QueryConfig;
 
 use SeTaco\Exceptions\Element\ElementException;
 use SeTaco\Exceptions\Element\ElementObstructedException;
+use SeTaco\Exceptions\Element\ElementNotEditableException;
 use SeTaco\Exceptions\Element\DomElementNotVisibleException;
 
 use SeTaco\Exceptions\QueryException;
@@ -21,6 +19,7 @@ use SeTaco\Exceptions\Query\ElementStillExistsException;
 use SeTaco\Exceptions\Query\MultipleElementsExistException;
 use SeTaco\Exceptions\Query\QueriedElementNotEditableException;
 use SeTaco\Exceptions\Query\QueriedElementNotClickableException;
+
 use Structura\Arrays;
 
 
@@ -193,12 +192,10 @@ class Query implements IQuery
 	
 	public function __construct(BrowserSetup $setup, WebDriverSearchContext $searchContext)
 	{
-		$this->setup = $setup;
-		
-		$this->config = $setup->QueryConfig;
-		$this->context = $searchContext;
+		$this->setup	= $setup;
+		$this->config	= $setup->QueryConfig;
+		$this->context	= $searchContext;
 	}
-	
 	
 	
 	public function exists(string $query, ?float $timeout = null, bool $isCaseSensitive = false): bool
@@ -210,7 +207,7 @@ class Query implements IQuery
 	{
 		$endTime = $this->config->getWaitUntil($timeout);
 		
-		while (microtime(true) < $endTime)
+		while (true)
 		{
 			foreach ($query as $item)
 			{
@@ -218,6 +215,11 @@ class Query implements IQuery
 				{
 					return true;
 				}
+			}
+			
+			if (microtime(true) >= $endTime)
+			{
+				break;
 			}
 			
 			usleep(50000);
@@ -232,7 +234,7 @@ class Query implements IQuery
 		
 		foreach ($query as $item)
 		{
-			$timeout = max(0.0, microtime(true) - $endTime);
+			$timeout = max(0.0, $endTime - microtime(true));
 			
 			if ($this->findAll($item, $timeout, $isCaseSensitive)->isEmpty())
 			{
@@ -250,7 +252,7 @@ class Query implements IQuery
 	
 	public function text(string $query, ?float $timeout = null, bool $isCaseSensitive = false): string
 	{
-		return $this->find($query, $timeout, $isCaseSensitive)->getRemoteWebElement()->getText();
+		return $this->find($query, $timeout, $isCaseSensitive)->getText();
 	}
 	
 	public function find(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
@@ -274,11 +276,11 @@ class Query implements IQuery
 	
 	public function findFirst($query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$selector = $this->getSelector($query, $isCaseSensitive);
-		$all = $this->queryAll($selector, $timeout);
+		$selectors = $this->getSelectors($query, $isCaseSensitive);
+		$all = $this->queryAll($query, $timeout, $isCaseSensitive);
 		
 		if (!$all->hasAny())
-			throw new ElementNotFoundException($selector);
+			throw new ElementNotFoundException($selectors);
 		
 		return $all->first();
 	}
@@ -299,14 +301,14 @@ class Query implements IQuery
 		return $this->queryAll($query, $timeout, $isCaseSensitive)->first();
 	}
 
-	public function waitForElement($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
 		$this->find($query, $timeout, $isCaseSensitive);
 	}
 	
-	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForAnyElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
-		$this->findAll($query, $timeout, $isCaseSensitive);
+		$this->findFirst($query, $timeout, $isCaseSensitive);
 	}
 	
 	public function waitForAllElements(array $query, ?float $timeout = null, bool $isCaseSensitive = false): void
@@ -315,7 +317,7 @@ class Query implements IQuery
 		
 		foreach ($query as $item)
 		{
-			$this->findAll($item, max(0.0, microtime(true) - $endTime), $isCaseSensitive);
+			$this->findFirst($item, max(0.0, microtime(true) - $endTime), $isCaseSensitive);
 		}
 	}
 	
