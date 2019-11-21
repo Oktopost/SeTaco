@@ -320,8 +320,9 @@ class Query implements IQuery
 		$this->findFirst($query, $timeout, $isCaseSensitive);
 	}
 	
-	public function waitForElements(array $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
+		$query = Arrays::toArray($query);
 		$endTime = $this->config->getWaitUntil($timeout);
 		
 		foreach ($query as $item)

@@ -21,7 +21,7 @@ interface IQuery
 	
 	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function waitForAnyElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function waitForElements(array $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function waitToDisappear(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function waitAllToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function waitAnyToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
