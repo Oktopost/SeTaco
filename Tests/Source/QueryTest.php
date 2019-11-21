@@ -548,18 +548,18 @@ class QueryTest extends TestCase
 	/**
 	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
 	 */
-	public function test_waitForAllElements_ElementMissing_ExceptionThrown()
+	public function test_waitForElements_ElementMissing_ExceptionThrown()
 	{
 		$browser = $this->getBrowser('<div>a</div>');
 		
-		$browser->waitForAllElements(['txt:a', 'txt:b', 'txt:c'], 0.0);
+		$browser->waitForElements(['txt:a', 'txt:b', 'txt:c'], 0.0);
 	}
 	
-	public function test_waitForAllElements_AllElementsExist_NoErrors()
+	public function test_waitForElements_AllElementsExist_NoErrors()
 	{
 		$browser = $this->getBrowser('<div>a</div><div>b</div><div>b</div><div>c</div>');
 		
-		$browser->waitForAllElements(['txt:a', 'txt:b', 'txt:c'], 0.0);
+		$browser->waitForElements(['txt:a', 'txt:b', 'txt:c'], 0.0);
 	}
 	
 	

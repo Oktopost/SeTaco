@@ -320,7 +320,7 @@ class Query implements IQuery
 		$this->findFirst($query, $timeout, $isCaseSensitive);
 	}
 	
-	public function waitForAllElements(array $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForElements(array $query, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
 		$endTime = $this->config->getWaitUntil($timeout);
 		
