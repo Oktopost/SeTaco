@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use SeTaco\BrowserSession;
 use SeTaco\Exceptions\Query\ElementNotFoundException;
 use SeTaco\Exceptions\Query\ElementStillExistsException;
+use SeTaco\Exceptions\Query\QueriedElementNotClickableException;
 use SeTaco\IBrowser;
 use SeTaco\TacoConfig;
 use Structura\Random;
@@ -779,4 +780,274 @@ class QueryTest extends TestCase
 		self::assertTrue($runTime > 0.12);
 	}
 	
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
+	 */
+	public function test_click_ElementNotFound_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('');
+		$browser->click('.a', 0.0);
+	}
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\QueriedElementNotClickableException
+	 */
+	public function test_click_ElementNotClickable_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('<div class="a"></div>');
+		$browser->click('.a', 0.0);
+	}
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\MultipleElementsExistException
+	 */
+	public function test_click_MoreThenOneElementExists_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('<button class="a"/><button class="a"/>');
+		$browser->click('.a', 0.0);
+	}
+	
+	public function test_click_ValidElement_InputSet()
+	{
+		$browser = $this->getBrowser('<button class="a" onclick="this.innerHTML=\'Goodbye\';">Hello</button>');
+		
+		
+		$browser->click('.a', 0.0);
+		
+		
+		self::assertNull($browser->tryFind('txt:Hello', 0.0));
+		self::assertNotNull($browser->findFirst('txt:Goodbye', 0.0));
+	}
+	
+	public function test_click_TimeoutUsed()
+	{
+		$browser = $this->getBrowser('<button class="a">');
+		
+		
+		$startTime = microtime(true);
+		$browser->click('.a', 0.0, false);
+		$emptyRunTime = microtime(true) - $startTime;
+		
+		
+		$startTime = microtime(true);
+		try { $browser->click('.b', 0.12, false); } catch (ElementNotFoundException $e) {}
+		$runTime = microtime(true) - $startTime;
+		
+		
+		self::assertTrue($runTime > $emptyRunTime);
+		self::assertTrue($runTime > 0.12);
+	}
+	
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
+	 */
+	public function test_clickAny_ElementNotFound_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('');
+		$browser->clickAny('.a', 0.0);
+	}
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\QueriedElementNotClickableException
+	 */
+	public function test_clickAny_ElementNotClickable_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('<div class="a"></div>');
+		$browser->clickAny('.a', 0.0);
+	}
+	
+	public function test_clickAny_MoreThenOneElementExists_FirstElementClicked()
+	{
+		$browser = $this->getBrowser(
+			'<button class="a" onclick="this.innerHTML=\'Goodbye 1\';">Hello</button>' . 
+			'<button class="a" onclick="this.innerHTML=\'Goodbye 2\';">Hello</button>'
+		);
+		
+		
+		$browser->clickAny('.a', 0.0);
+		
+		
+		self::assertNull($browser->tryFind('txt:Goodbye 2', 0.0));
+		self::assertNotNull($browser->findFirst('txt:Goodbye 1', 0.0));
+	}
+	
+	public function test_clickAny_NonClickableAndClickableElementsExist_FirstClickableElementClicked()
+	{
+		$browser = $this->getBrowser(
+			'<div class="a"></div>' . 
+			'<button class="a" onclick="this.innerHTML=\'Goodbye\';">Hello</button>'
+		);
+		
+		
+		$browser->clickAny('.a', 0.0);
+		
+		
+		self::assertNull($browser->tryFind('txt:Hello', 0.0));
+		self::assertNotNull($browser->findFirst('txt:Goodbye', 0.0));
+	}
+	
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
+	 */
+	public function test_hover_ElementNotFound_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('');
+		$browser->hover('.a', 0.0);
+	}
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\MultipleElementsExistException
+	 */
+	public function test_hover_MoreThenOneElementExists_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('<div class="a">abc</div><div class="a">def</div>');
+		$browser->hover('.a', 0.0);
+	}
+	
+	public function test_hover_ValidElement_InputSet()
+	{
+		$browser = $this->getBrowser('<div class="a" onmouseover="this.innerHTML=\'Goodbye\';">Hello</div>');
+		
+		
+		$browser->hover('.a', 0.0);
+		
+		
+		self::assertNull($browser->tryFind('txt:Hello', 0.0));
+		self::assertNotNull($browser->findFirst('txt:Goodbye', 0.0));
+	}
+	
+	public function test_hover_TimeoutUsed()
+	{
+		$browser = $this->getBrowser('<div class="a">abc</div>');
+		
+		
+		$startTime = microtime(true);
+		$browser->hover('.a', 0.0, false);
+		$emptyRunTime = microtime(true) - $startTime;
+		
+		
+		$startTime = microtime(true);
+		try { $browser->hover('.b', 0.12, false); } catch (ElementNotFoundException $e) {}
+		$runTime = microtime(true) - $startTime;
+		
+		
+		self::assertTrue($runTime > $emptyRunTime);
+		self::assertTrue($runTime > 0.12);
+	}
+	
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
+	 */
+	public function test_hoverAny_ElementNotFound_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('');
+		$browser->hoverAny('.a', 0.0);
+	}
+	
+	public function test_hoverAny_MoreThenOneElementExists_FirstElementHovered()
+	{
+		$browser = $this->getBrowser(
+			'<div class="a" onmouseover="this.innerHTML=\'Goodbye 1\';">Hello 1</div>' . 
+			'<div class="a" onmouseover="this.innerHTML=\'Goodbye 2\';">Hello 2</div>'
+		);
+		
+		
+		$browser->hoverAny('.a', 0.0);
+		
+		
+		self::assertNull($browser->tryFind('txt:Hello 1', 0.0));
+		self::assertNotNull($browser->tryFind('txt:Hello 2', 0.0));
+		
+		self::assertNotNull($browser->tryFind('txt:Goodbye 1', 0.0));
+		self::assertNull($browser->tryFind('txt:Goodbye 2', 0.0));	
+	}
+	
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
+	 */
+	public function test_hoverAndClick_ElementNotFound_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('');
+		$browser->hoverAndClick('.a', 0.0);
+	}
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\MultipleElementsExistException
+	 */
+	public function test_hoverAndClick_MoreThenOneElementExists_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('<div class="a">abc</div><div class="a">def</div>');
+		$browser->hoverAndClick('.a', 0.0);
+	}
+	
+	public function test_hoverAndClick_ElementExists_ElementHoveredAndClicked()
+	{
+		$browser = $this->getBrowser(
+			'<div onmouseover="getElementById(\'btn\').style.visibility=null">' . 
+				'<button onclick="this.innerHTML=\'Goodbye\';" style="visibility: hidden" id="btn">Hello</button>' . 
+			'</div>'
+		);
+		
+		
+		try
+		{
+			$browser->click('#btn', 0.0);
+			$this->fail('Element is clickable without hover.');
+		}
+		catch (QueriedElementNotClickableException $e)
+		{
+			// Sanity test
+		}
+		
+		
+		$browser->hoverAndClick('#btn');
+		
+		
+		self::assertNull($browser->tryFind('txt:Hello', 0.0));
+		self::assertNotNull($browser->tryFind('txt:Goodbye', 0.0));
+	}
+	
+	
+	
+	/**
+	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
+	 */
+	public function test_hoverAndClickAny_ElementNotFound_ExceptionThrown()
+	{
+		$browser = $this->getBrowser('');
+		$browser->hoverAndClickAny('.a', 0.0);
+	}
+	
+	public function test_hoverAndClickAny_MultipleElementsExist_OnlyHoverableElementIsUsed()
+	{
+		$browser = $this->getBrowser(
+			'<div class="a"></div>' . 
+			'<div onmouseover="getElementById(\'btn\').style.visibility=null">' . 
+				'<button class="a" onclick="this.innerHTML=\'Goodbye\';" style="visibility: hidden" id="btn">Hello</button>' . 
+			'</div>'
+		);
+		
+		
+		try
+		{
+			$browser->clickAny('.a', 0.0);
+			$this->fail('Element is clickable without hover.');
+		}
+		catch (QueriedElementNotClickableException $e)
+		{
+			// Sanity test
+		}
+		
+		
+		$browser->hoverAndClickAny('#btn');
+		
+		
+		self::assertNull($browser->tryFind('txt:Hello', 0.0));
+		self::assertNotNull($browser->tryFind('txt:Goodbye', 0.0));
+	}
 }

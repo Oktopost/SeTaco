@@ -51,14 +51,7 @@ class Query implements IQuery
 		
 		foreach (Arrays::toArray($query) as $item)
 		{
-			if ($item instanceof ISelector)
-			{
-				$selectors[] = $item;
-			}
-			else
-			{
-				$selectors[] = $this->getSelector($item, $isCaseSensitive);
-			}
+			$selectors[] = $this->getSelector($item, $isCaseSensitive);
 		}
 		
 		return $selectors;
@@ -137,22 +130,38 @@ class Query implements IQuery
 		}
 	}
 	
-	private function unsafeClickElement($query, bool $isCaseSensitive, IDomElement $e)
+	/**
+	 * @param $query
+	 * @param bool $isCaseSensitive
+	 * @param IDomElement|IDomElement[] $e
+	 * @throws QueriedElementNotClickableException
+	 */
+	private function unsafeClickElement($query, bool $isCaseSensitive, $e)
 	{
+		/** @var IDomElement[] $elements */
+		$elements = Arrays::toArray($e);
 		$selector = $this->getSelector($query, $isCaseSensitive);
 		
-		try
+		$e = new ElementNotFoundException($selector);
+		
+		foreach ($elements as $e)
 		{
-			$e->click();
+			try
+			{
+				$e->click();
+				return;
+			}
+			catch (DomElementNotVisibleException $ev)
+			{
+				$e = new QueriedElementNotClickableException($selector, $ev->getMessage());
+			}
+			catch (ElementObstructedException $eo)
+			{
+				$e = new QueriedElementNotClickableException($selector, $eo->getMessage());
+			}
 		}
-		catch (DomElementNotVisibleException $ev)
-		{
-			throw new QueriedElementNotClickableException($selector, $ev->getMessage());
-		}
-		catch (ElementObstructedException $eo)
-		{
-			throw new QueriedElementNotClickableException($selector, $eo->getMessage());
-		}
+		
+		throw $e;
 	}
 	
 	private function unsafeInputElement(string $query, bool $isCaseSensitive, IDomElement $e, $value)
@@ -418,7 +427,7 @@ class Query implements IQuery
 		$this->unsafeClick(
 			function ($query, ?float $timeout = null, bool $isCaseSensitive = false)
 			{
-				return $this->findFirst($query, $timeout, $isCaseSensitive);
+				return $this->findAll($query, $timeout, $isCaseSensitive)->get();
 			},
 			$query, $timeout, $isCaseSensitive
 		);
