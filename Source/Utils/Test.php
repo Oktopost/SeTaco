@@ -11,7 +11,7 @@ class Test
 	{
 		echo "Checking selenium instance is running... ";
 		
-		$result = shell_exec('./vendor/bin/selenium.sh status');
+		$result = SeleniumConnector::isRunning();
 		
 		if ($result)
 		{
@@ -28,13 +28,13 @@ class Test
 	private static  function startSelenium(): void
 	{
 		echo "\nStarting new selenium instance\n";
-		shell_exec('./vendor/bin/selenium.sh start');
+		SeleniumConnector::startSelenium();
 	}
 	
 	private static function stopSelenium(): void
 	{
 		echo "\nStopping selenium instance\n";
-		shell_exec('./vendor/bin/selenium.sh stop');
+		SeleniumConnector::stopSelenium();
 	}
 	
 	private static function combineArgs(Event $event, ?array $arguments = []): array

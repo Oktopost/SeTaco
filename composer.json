@@ -43,7 +43,6 @@
 		"post-install-cmd": [
 			"SeTaco\\Utils\\ComposerUtils::composerPostInstallHook"
 		],
-		"selenium": "java -Dwebdriver.chrome.driver=\"vendor/bin/chromedriver\" -jar vendor/bin/selenium.jar",
 		"test": "SeTaco\\Utils\\Test::test",
         "test-cover": "SeTaco\\Utils\\Test::testCover"
     },

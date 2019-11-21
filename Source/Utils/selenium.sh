@@ -27,6 +27,9 @@ case $1 in
       echo "No selenium instance found"
     fi
     ;;
+  listen*)
+  	tail -f -n 100 /tmp/selenium.out
+  	;;
   *)
     echo 'Wait, what?';
     ;;
