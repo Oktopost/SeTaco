@@ -131,7 +131,7 @@ class Query implements IQuery
 	}
 	
 	/**
-	 * @param $query
+	 * @param string|string[] $query
 	 * @param bool $isCaseSensitive
 	 * @param IDomElement|IDomElement[] $e
 	 * @throws QueriedElementNotClickableException
@@ -140,7 +140,7 @@ class Query implements IQuery
 	{
 		/** @var IDomElement[] $elements */
 		$elements = Arrays::toArray($e);
-		$selector = $this->getSelector($query, $isCaseSensitive);
+		$selector = $this->getSelectors($query, $isCaseSensitive);
 		
 		$e = new ElementNotFoundException($selector);
 		
