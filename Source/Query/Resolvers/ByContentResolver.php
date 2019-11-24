@@ -15,7 +15,7 @@ class ByContentResolver implements IQueryResolver
 	 */
 	public function resolve(string $query, bool $isCaseSensitive)
 	{
-		$text = 'text()'; 
+		$text = '.'; 
 		
 		if (!$isCaseSensitive)
 		{
@@ -23,6 +23,6 @@ class ByContentResolver implements IQueryResolver
 			$query = strtolower($query);
 		}
 		
-		return "//body//*[contains($text, '$query')][not(self::script)]";
+		return "//body//*[text()[contains($text, '$query')]][not(self::script)]";
 	}
 }

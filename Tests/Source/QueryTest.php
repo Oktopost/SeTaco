@@ -562,6 +562,25 @@ class QueryTest extends TestCase
 		$browser->waitForElements(['txt:a', 'txt:b', 'txt:c'], 0.0);
 	}
 	
+	public function test_waitForElements_QueryTimeoutUsed()
+	{
+		$browser = $this->getBrowser('<div class="a"></div>');
+		
+		
+		$startTime = microtime(true);
+		$browser->waitForElements('.a', 0.0, false); 
+		$emptyRunTime = microtime(true) - $startTime;
+		
+		
+		$startTime = microtime(true);
+		try { $browser->waitForElements('.b', 0.12, false); } catch (ElementNotFoundException $e) {}
+		$runTime = microtime(true) - $startTime;
+		
+		
+		self::assertTrue($runTime > $emptyRunTime);
+		self::assertTrue($runTime > 0.12);
+	}
+	
 	
 	public function test_waitToDisappear_ElementMissing_NoErrors()
 	{

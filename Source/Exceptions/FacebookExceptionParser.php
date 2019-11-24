@@ -12,6 +12,7 @@ use SeTaco\Exceptions\Element\DomElementNotVisibleException;
 
 use SeTaco\Exceptions\Element\ElementNotEditableException;
 use SeTaco\Exceptions\Element\ElementObstructedException;
+
 use Structura\Strings;
 use Traitor\TStaticClass;
 
@@ -21,23 +22,31 @@ class FacebookExceptionParser
 	use TStaticClass;
 	
 	
-	private static function handleUnknown(UnknownServerException $u)
+	private static function handleIsObstructedException(string $message): bool
 	{
-		if (Strings::contains($u->getMessage(), 'Other element would receive the click'))
+		if (Strings::contains($message, 'Other element would receive the click'))
 		{
-			$other = explode('Other element would receive the click: ', $u->getMessage())[1] ?? '';
+			$other = explode('Other element would receive the click: ', $message)[1] ?? '';
 			$other = trim(explode("\n", $other)[0] ?? '');
 			
 			throw new ElementObstructedException($other ?: null);
 		}
-		else
-		{
-			throw new SeTacoException('Unexpected UnknownServerException exception', 0, $u);
-		}
+		
+		return false;
+	}
+	
+	
+	private static function handleUnknown(UnknownServerException $u)
+	{
+		self::handleIsObstructedException($u->getMessage());
+		
+		throw new SeTacoException('Unexpected UnknownServerException exception', 0, $u);
 	}
 	
 	private static function handleUnrecognized(UnrecognizedExceptionException $u)
 	{
+		self::handleIsObstructedException($u->getMessage());
+		
 		if (Strings::contains($u->getMessage(), 'element not interactable'))
 		{
 			throw new ElementNotEditableException();

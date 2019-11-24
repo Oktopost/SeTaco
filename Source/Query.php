@@ -327,7 +327,7 @@ class Query implements IQuery
 		
 		foreach ($query as $item)
 		{
-			$this->findFirst($item, max(0.0, microtime(true) - $endTime), $isCaseSensitive);
+			$this->tryFindFirst($item, max(0.0, $endTime - microtime(true)), $isCaseSensitive);
 		}
 	}
 	
@@ -345,7 +345,7 @@ class Query implements IQuery
 		$selectors = $originalSelectors;
 		$selector = array_shift($selectors);
 		
-		while (true)
+		while ($selector)
 		{
 			while ($selector)
 			{
