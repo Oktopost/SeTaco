@@ -2,7 +2,10 @@
 use SeTaco\Utils\SeleniumConnector;
 
 
-require_once __DIR__ . '/vendor/autoload.php';
+if (!class_exists(SeleniumConnector::class))
+{
+	require_once __DIR__ . '/vendor/autoload.php';
+}
 
 
 if (array_search('tail-log', $argv) !== false)
