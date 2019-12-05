@@ -11,7 +11,7 @@ class SeleniumConnector
 	use TStaticClass;
 	
 	
-	private const PATH_TO_SELENIUM_SH = __DIR__ . '/../../vendor/bin/selenium.sh';
+	private const PATH_TO_SELENIUM_SH = __DIR__ . '/selenium.sh';
 	
 	
 	private static function getSHCommand(string ...$args): string

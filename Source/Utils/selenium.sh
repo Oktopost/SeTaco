@@ -6,6 +6,11 @@ function getPid
     ps ax | grep vendor/bin/selenium.jar | grep -v grep | awk {'print $1'}
 }
 
+function getPgid
+{
+    ps x -o pgid,cmd | grep vendor/bin/selenium.jar | grep -v grep | awk {'print $1'}
+}
+
 
 case $1 in
   status*)
@@ -20,9 +25,9 @@ case $1 in
     fi 
     ;;
   stop*)
-    if [ "`getPid`" != "" ]; then
-        kill -9 `getPid`
-        echo "Selenium instance was killed"
+   	if [ "`getPgid`" != "" ]; then
+      kill -9 -`getPgid`
+      echo "Selenium instance was killed"
     else
       echo "No selenium instance found"
     fi
