@@ -164,13 +164,13 @@ class Query implements IQuery
 		throw $e;
 	}
 	
-	private function unsafeInputElement(string $query, bool $isCaseSensitive, IDomElement $e, $value)
+	private function unsafeInputElement(string $query, bool $isCaseSensitive, IDomElement $e, $value, bool $clear = false): void
 	{
 		$selector = $this->getSelector($query, $isCaseSensitive);
 		
 		try
 		{
-			$e->input($value);
+			$e->input($value, $clear);
 		}
 		catch (ElementNotEditableException $eee)
 		{
@@ -194,6 +194,19 @@ class Query implements IQuery
 			{
 				$el = $search($query, $timeout, $isCaseSensitive);
 				$this->unsafeClickElement($query, $isCaseSensitive, $el);
+			},
+			$timeout);
+	}
+	
+	private function execInput(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false,
+		bool $clear = false): void
+	{
+		$this->executeRetryCallback(
+			function(float $timeout)
+				use ($query, $isCaseSensitive, $value, $clear)
+			{
+				$el = $this->find($query, $timeout, $isCaseSensitive);
+				$this->unsafeInputElement($query, $isCaseSensitive, $el, $value, $clear);
 			},
 			$timeout);
 	}
@@ -402,14 +415,12 @@ class Query implements IQuery
 	
 	public function input(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void
 	{
-		$this->executeRetryCallback(
-			function(float $timeout)
-				use ($query, $isCaseSensitive, $value)
-			{
-				$el = $this->find($query, $timeout, $isCaseSensitive);
-				$this->unsafeInputElement($query, $isCaseSensitive, $el, $value);
-			},
-			$timeout);
+		$this->execInput($query, $value, $timeout, $isCaseSensitive, false);
+	}
+	
+	public function clearAndInput(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void
+	{
+		$this->execInput($query, $value, $timeout, $isCaseSensitive, true);
 	}
 	
 	public function click(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void

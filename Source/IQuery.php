@@ -27,6 +27,7 @@ interface IQuery
 	public function waitAnyToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	
 	public function input(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	public function clearAndInput(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	
 	public function click(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
 	public function clickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
