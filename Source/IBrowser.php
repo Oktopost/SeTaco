@@ -16,7 +16,6 @@ interface IBrowser extends IQuery
 	public function getBrowserName(): string;
 	public function goto(string $url): IBrowser;
 	public function formInput(array $keywordValuePairs, ?string $submit = null, ?float $timeout = null): IBrowser;
-	public function keyboard(): RemoteKeyboard;
 	
 	public function compareURL(string $url): bool;
 	public function waitForURL(string $url, ?float $timeout = null): void;
@@ -40,4 +39,11 @@ interface IBrowser extends IQuery
 	
 	public function deleteCookie(string $named): void;
 	public function deleteCookies(): void;
+	
+	
+	// Keyboard
+	public function press(string $key): void;
+	public function pressEsc(): void;
+	public function pressEnter(): void;
+	public function keyboard(): RemoteKeyboard;
 }

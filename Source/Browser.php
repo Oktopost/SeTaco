@@ -2,6 +2,7 @@
 namespace SeTaco;
 
 
+use Facebook\WebDriver\WebDriverKeys;
 use SeTaco\Config\TargetConfig;
 use SeTaco\Exceptions\Browser\URLCompareException;
 
@@ -59,11 +60,6 @@ class Browser extends Query implements IBrowser
 	{
 		$this->getRemoteWebDriver()->navigate()->to($this->getTargetConfig()->getURL($url));
 		return $this;
-	}
-	
-	public function keyboard(): RemoteKeyboard
-	{
-		return $this->getRemoteWebDriver()->getKeyboard();
 	}
 	
 	public function formInput(array $keywordValuePairs, ?string $submit = null, ?float $timeout = null): IBrowser
@@ -186,5 +182,26 @@ class Browser extends Query implements IBrowser
 	public function deleteCookies(): void
 	{
 		$this->getRemoteWebDriver()->manage()->deleteAllCookies();
+	}
+	
+	
+	public function press(string $key): void
+	{
+		$this->keyboard()->pressKey($key);
+	}
+	
+	public function pressEsc(): void
+	{
+		$this->press(WebDriverKeys::ESCAPE);
+	}
+	
+	public function pressEnter(): void
+	{
+		$this->press(WebDriverKeys::ENTER);
+	}
+	
+	public function keyboard(): RemoteKeyboard
+	{
+		return $this->getRemoteWebDriver()->getKeyboard();
 	}
 }
