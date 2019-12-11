@@ -2,6 +2,7 @@
 namespace SeTaco\Source;
 
 
+use function GuzzleHttp\Psr7\_caseless_remove;
 use PHPUnit\Framework\TestCase;
 use SeTaco\BrowserSession;
 use SeTaco\Exceptions\Query\ElementNotFoundException;
@@ -1032,7 +1033,6 @@ class QueryTest extends TestCase
 	}
 	
 	
-	
 	/**
 	 * @expectedException \SeTaco\Exceptions\Query\ElementNotFoundException
 	 */
@@ -1068,5 +1068,32 @@ class QueryTest extends TestCase
 		
 		self::assertNull($browser->tryFind('txt:Hello', 0.0));
 		self::assertNotNull($browser->tryFind('txt:Goodbye', 0.0));
+	}
+	
+	
+	public function test_while_SanityTest()
+	{
+		$counter = 0;
+		$calledCounter = 0;
+		$browser = $this->getBrowser('');
+		
+		$endTime = microtime(true) + 1.0;
+		
+		$browser->while(function() 
+				use (&$counter, $endTime) 
+			{
+				$counter++;
+				return ($endTime > microtime(true) + 0.1);
+			},
+			0.1,
+			1.0)
+			->execute(function ()
+				use (&$calledCounter)
+			{
+				$calledCounter++;
+			});
+		
+		self::assertEquals(1, $calledCounter);
+		self::assertTrue($counter >= 8 && $counter <= 10);
 	}
 }

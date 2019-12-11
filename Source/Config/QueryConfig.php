@@ -180,4 +180,27 @@ class QueryConfig
 	{
 		return microtime(true) + (is_null($given) ? $this->defaultTimeout : $given);
 	}
+	
+	public function callbacksInvoker(): ?callable
+	{
+		return null;
+	}
+	
+	/**
+	 * @param callable $callback
+	 * @return mixed
+	 */
+	public function invokeCallback(callable $callback)
+	{
+		$invoker = $this->callbacksInvoker();
+		
+		if ($invoker)
+		{
+			return $invoker($callback);
+		}
+		else
+		{
+			return $callback();
+		}
+	}
 }

@@ -2,7 +2,7 @@
 namespace SeTaco;
 
 
-interface IQuery
+interface IQuery extends IQueryAction, IRepeater
 {
 	public function exists(string $query, ?float $timeout = null, bool $isCaseSensitive = false): bool;
 	public function existsAny(array $query, ?float $timeout = null, bool $isCaseSensitive = false): bool;
@@ -19,22 +19,33 @@ interface IQuery
 	public function tryFind(string $query, ?float $timeout = null, bool $isCaseSensitive = false): ?IDomElement;
 	public function tryFindFirst($query, ?float $timeout = null, bool $isCaseSensitive = false): ?IDomElement;
 	
-	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function waitForAnyElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function waitToDisappear(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function waitAllToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function waitAnyToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	/**
+	 * @return static
+	 */
+	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery;
 	
-	public function input(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function clearAndInput(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	/**
+	 * @return static
+	 */
+	public function waitForAnyElements($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery;
 	
-	public function click(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function clickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	/**
+	 * @return static
+	 */
+	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery;
 	
-	public function hover(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function hoverAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	/**
+	 * @return static
+	 */
+	public function waitToDisappear(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery;
 	
-	public function hoverAndClick(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void;
-	public function hoverAndClickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void;
+	/**
+	 * @return static
+	 */
+	public function waitAllToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery;
+	
+	/**
+	 * @return static
+	 */
+	public function waitAnyToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery;
 }

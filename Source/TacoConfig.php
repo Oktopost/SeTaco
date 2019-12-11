@@ -8,6 +8,7 @@ use Objection\LiteSetup;
 use Objection\LiteObject;
 
 use SeTaco\Query\DefaultSetup;
+
 use SeTaco\Config\Mapper;
 use SeTaco\Config\ServerConfig;
 use SeTaco\Config\TargetConfig;

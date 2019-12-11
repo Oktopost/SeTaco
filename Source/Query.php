@@ -6,6 +6,7 @@ use Facebook\WebDriver\WebDriverSearchContext;
 use Facebook\WebDriver\Exception\WebDriverException;
 
 use SeTaco\Query\ISelector;
+use SeTaco\Repeat\Repeater;
 use SeTaco\Config\QueryConfig;
 
 use SeTaco\Exceptions\Element\ElementException;
@@ -135,36 +136,37 @@ class Query implements IQuery
 	 * @param bool $isCaseSensitive
 	 * @param IDomElement|IDomElement[] $e
 	 * @throws QueriedElementNotClickableException
+	 * @return IDomElement
 	 */
-	private function unsafeClickElement($query, bool $isCaseSensitive, $e)
+	private function unsafeClickElement($query, bool $isCaseSensitive, $e): IDomElement
 	{
 		/** @var IDomElement[] $elements */
 		$elements = Arrays::toArray($e);
 		$selector = $this->getSelectors($query, $isCaseSensitive);
 		
-		$e = new ElementNotFoundException($selector);
+		$error = new ElementNotFoundException($selector);
 		
 		foreach ($elements as $e)
 		{
 			try
 			{
-				$e->click();
-				return;
+				return $e->click();
 			}
 			catch (DomElementNotVisibleException $ev)
 			{
-				$e = new QueriedElementNotClickableException($selector, $ev->getMessage());
+				$error = new QueriedElementNotClickableException($selector, $ev->getMessage());
 			}
 			catch (ElementObstructedException $eo)
 			{
-				$e = new QueriedElementNotClickableException($selector, $eo->getMessage());
+				$error = new QueriedElementNotClickableException($selector, $eo->getMessage());
 			}
 		}
 		
-		throw $e;
+		throw $error;
 	}
 	
-	private function unsafeInputElement(string $query, bool $isCaseSensitive, IDomElement $e, $value, bool $clear = false): void
+	private function unsafeInputElement(string $query, bool $isCaseSensitive,
+		IDomElement $e, $value, bool $clear = false): IDomElement
 	{
 		$selector = $this->getSelector($query, $isCaseSensitive);
 		
@@ -184,29 +186,31 @@ class Query implements IQuery
 		{
 			throw new QueriedElementNotEditableException($selector, $eo->getMessage());
 		}
+		
+		return $e;
 	}
 	
 	private function unsafeClick(callable $search, $query, ?float $timeout, bool $isCaseSensitive)
 	{
-		$this->executeRetryCallback(
+		return $this->executeRetryCallback(
 			function(float $timeout)
-				use ($search, $query, $isCaseSensitive)
+				use ($search, $query, $isCaseSensitive, &$result)
 			{
 				$el = $search($query, $timeout, $isCaseSensitive);
-				$this->unsafeClickElement($query, $isCaseSensitive, $el);
+				return $this->unsafeClickElement($query, $isCaseSensitive, $el);
 			},
 			$timeout);
 	}
 	
 	private function execInput(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false,
-		bool $clear = false): void
+		bool $clear = false): IDomElement
 	{
-		$this->executeRetryCallback(
+		return $this->executeRetryCallback(
 			function(float $timeout)
 				use ($query, $isCaseSensitive, $value, $clear)
 			{
 				$el = $this->find($query, $timeout, $isCaseSensitive);
-				$this->unsafeInputElement($query, $isCaseSensitive, $el, $value, $clear);
+				return $this->unsafeInputElement($query, $isCaseSensitive, $el, $value, $clear);
 			},
 			$timeout);
 	}
@@ -323,33 +327,38 @@ class Query implements IQuery
 		return $this->queryAll($query, $timeout, $isCaseSensitive)->first();
 	}
 
-	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForElement(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery
 	{
 		$this->find($query, $timeout, $isCaseSensitive);
+		return $this;
 	}
 	
-	public function waitForAnyElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForAnyElements($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery
 	{
 		$this->findFirst($query, $timeout, $isCaseSensitive);
+		return $this;
 	}
 	
-	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitForElements($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery
 	{
 		$query = Arrays::toArray($query);
 		$endTime = $this->config->getWaitUntil($timeout);
 		
 		foreach ($query as $item)
 		{
-			$this->tryFindFirst($item, max(0.0, $endTime - microtime(true)), $isCaseSensitive);
+			$this->findFirst($item, max(0.0, $endTime - microtime(true)), $isCaseSensitive);
 		}
+		
+		return $this;
 	}
 	
-	public function waitToDisappear(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitToDisappear(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery
 	{
 		$this->waitAllToDisappear($query, $timeout, $isCaseSensitive);
+		return $this;
 	}
 	
-	public function waitAllToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitAllToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery
 	{
 		$timeout = $this->config->getTimeout($timeout);
 		$endTime = $this->config->getWaitUntil($timeout);
@@ -383,9 +392,11 @@ class Query implements IQuery
 		{
 			throw new ElementStillExistsException($originalSelectors, $timeout);
 		}
+		
+		return $this;
 	}
 	
-	public function waitAnyToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function waitAnyToDisappear($query, ?float $timeout = null, bool $isCaseSensitive = false): IQuery
 	{
 		$timeout = $this->config->getTimeout($timeout);
 		$endTime = $this->config->getWaitUntil($timeout);
@@ -398,7 +409,7 @@ class Query implements IQuery
 			{
 				if (!$selector->searchIn($this->context))
 				{
-					return;
+					return $this;
 				}
 			}
 			
@@ -413,19 +424,19 @@ class Query implements IQuery
 		throw new ElementStillExistsException($selectors, $timeout);
 	}
 	
-	public function input(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function input(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->execInput($query, $value, $timeout, $isCaseSensitive, false);
+		return $this->execInput($query, $value, $timeout, $isCaseSensitive, false);
 	}
 	
-	public function clearAndInput(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function clearAndInput(string $query, string $value, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->execInput($query, $value, $timeout, $isCaseSensitive, true);
+		return $this->execInput($query, $value, $timeout, $isCaseSensitive, true);
 	}
 	
-	public function click(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function click(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->unsafeClick(
+		return $this->unsafeClick(
 			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
 			{
 				return $this->find($query, $timeout, $isCaseSensitive);
@@ -434,9 +445,9 @@ class Query implements IQuery
 		);
 	}
 	
-	public function clickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function clickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->unsafeClick(
+		return $this->unsafeClick(
 			function ($query, ?float $timeout = null, bool $isCaseSensitive = false)
 			{
 				return $this->findAll($query, $timeout, $isCaseSensitive)->get();
@@ -445,19 +456,19 @@ class Query implements IQuery
 		);
 	}
 	
-	public function hover(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function hover(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->find($query, $timeout, $isCaseSensitive)->hover();
+		return $this->find($query, $timeout, $isCaseSensitive)->hover();
 	}
 	
-	public function hoverAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function hoverAny($query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->findFirst($query, $timeout, $isCaseSensitive)->hover();
+		return $this->findFirst($query, $timeout, $isCaseSensitive)->hover();
 	}
 	
-	public function hoverAndClick(string $query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function hoverAndClick(string $query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->unsafeClick(
+		return $this->unsafeClick(
 			function (string $query, ?float $timeout = null, bool $isCaseSensitive = false)
 			{
 				$el = $this->find($query, $timeout, $isCaseSensitive)->hover();
@@ -467,9 +478,9 @@ class Query implements IQuery
 		);
 	}
 	
-	public function hoverAndClickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): void
+	public function hoverAndClickAny($query, ?float $timeout = null, bool $isCaseSensitive = false): IDomElement
 	{
-		$this->unsafeClick(
+		return $this->unsafeClick(
 			function ($query, ?float $timeout = null, bool $isCaseSensitive = false)
 			{
 				$el = $this->findFirst($query, $timeout, $isCaseSensitive)->hover();
@@ -477,5 +488,75 @@ class Query implements IQuery
 			},
 			$query, $timeout, $isCaseSensitive
 		);
+	}
+	
+	public function while(callable $callback, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->while($callback, $delay, $timeout); 
+	}
+	
+	public function whileNull(callable $callback, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileNull($callback, $delay, $timeout);
+	}
+	
+	public function whileNotNull(callable $callback, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileNotNull($callback, $delay, $timeout);
+	}
+	
+	public function whileEquals(callable $callback, $value, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileEquals($callback, $value, $delay, $timeout);
+	}
+	
+	public function whileNotEquals(callable $callback, $value, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileNotEquals($callback, $value, $delay, $timeout);
+	}
+	
+	public function whileSame(callable $callback, $value, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileSame($callback, $value, $delay, $timeout);
+	}
+	
+	public function whileNotSame(callable $callback, $value, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileNotSame($callback, $value, $delay, $timeout);
+	}
+	
+	public function whileThrowing(callable $callback, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileThrowing($callback, $delay, $timeout);
+	}
+	
+	public function whileElementExists(string $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileElementExists($selector, $isCaseSensitive, $delay, $timeout);
+	}
+	
+	public function whileElementMissing(string $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileElementMissing($selector, $isCaseSensitive, $delay, $timeout);
+	}
+	
+	public function whileAnyElementExists(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileAnyElementExists($selector, $isCaseSensitive, $delay, $timeout);
+	}
+	
+	public function whileAnyElementMissing(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileAnyElementMissing($selector, $isCaseSensitive, $delay, $timeout);
+	}
+	
+	public function whileAllElementsExist(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileAllElementsExist($selector, $isCaseSensitive, $delay, $timeout);
+	}
+	
+	public function whileAllElementsMissing(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	{
+		return (new Repeater($this, $this->config))->whileAllElementsMissing($selector, $isCaseSensitive, $delay, $timeout);
 	}
 }
