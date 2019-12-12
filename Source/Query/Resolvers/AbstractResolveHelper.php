@@ -4,7 +4,7 @@ namespace SeTaco\Query\Resolvers;
 
 class AbstractResolveHelper
 {
-	public static function generateResolve(string $type, string $tag, string $value, bool $isCaseSensitive): string
+	public static function generateResolve(string $type, string $tag, string $value, bool $isCaseSensitive = false): string
 	{
 		$tag = "@$tag";
 		

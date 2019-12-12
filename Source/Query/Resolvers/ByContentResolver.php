@@ -13,7 +13,7 @@ class ByContentResolver implements IQueryResolver
 	 * @param bool $isCaseSensitive
 	 * @return string|ISelector|null
 	 */
-	public function resolve(string $query, bool $isCaseSensitive)
+	public function resolve(string $query, bool $isCaseSensitive = false)
 	{
 		$text = '.'; 
 		

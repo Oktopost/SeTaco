@@ -15,7 +15,7 @@ class ByAttributeResolver implements IQueryResolver
 	 * @param bool $isCaseSensitive
 	 * @return string|ISelector|null
 	 */
-	public function resolve(string $query, bool $isCaseSensitive)
+	public function resolve(string $query, bool $isCaseSensitive = false)
 	{
 		if (!Strings::contains($query, '='))
 			throw new SeTacoException('Attribute resolver must contain the = sign, "Name=Value". Got ' . $query);

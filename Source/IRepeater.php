@@ -13,10 +13,10 @@ interface IRepeater
 	public function whileNotSame(callable $callback, $value, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
 	public function whileThrowing(callable $callback, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
 	
-	public function whileElementExists(string $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
-	public function whileElementMissing(string $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
-	public function whileAnyElementExists(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
-	public function whileAnyElementMissing(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
-	public function whileAllElementsExist(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
-	public function whileAllElementsMissing(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
+	public function whileElementExists(string $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
+	public function whileElementMissing(string $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
+	public function whileAnyElementExists(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
+	public function whileAnyElementMissing(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
+	public function whileAllElementsExist(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
+	public function whileAllElementsMissing(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction;
 }

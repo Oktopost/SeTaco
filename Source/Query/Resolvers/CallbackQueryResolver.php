@@ -26,7 +26,7 @@ class CallbackQueryResolver implements IQueryResolver
 	 * @param bool $isCaseSensitive
 	 * @return string|ISelector|null
 	 */
-	public function resolve(string $query, bool $isCaseSensitive): ?string
+	public function resolve(string $query, bool $isCaseSensitive = false): ?string
 	{
 		return call_user_func($this->callable, $query, $isCaseSensitive) ?? null;
 	}

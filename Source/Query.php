@@ -530,32 +530,32 @@ class Query implements IQuery
 		return (new Repeater($this, $this->config))->whileThrowing($callback, $delay, $timeout);
 	}
 	
-	public function whileElementExists(string $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	public function whileElementExists(string $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction
 	{
 		return (new Repeater($this, $this->config))->whileElementExists($selector, $isCaseSensitive, $delay, $timeout);
 	}
 	
-	public function whileElementMissing(string $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	public function whileElementMissing(string $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction
 	{
 		return (new Repeater($this, $this->config))->whileElementMissing($selector, $isCaseSensitive, $delay, $timeout);
 	}
 	
-	public function whileAnyElementExists(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	public function whileAnyElementExists(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction
 	{
 		return (new Repeater($this, $this->config))->whileAnyElementExists($selector, $isCaseSensitive, $delay, $timeout);
 	}
 	
-	public function whileAnyElementMissing(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	public function whileAnyElementMissing(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction
 	{
 		return (new Repeater($this, $this->config))->whileAnyElementMissing($selector, $isCaseSensitive, $delay, $timeout);
 	}
 	
-	public function whileAllElementsExist(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	public function whileAllElementsExist(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction
 	{
 		return (new Repeater($this, $this->config))->whileAllElementsExist($selector, $isCaseSensitive, $delay, $timeout);
 	}
 	
-	public function whileAllElementsMissing(array $selector, bool $isCaseSensitive, float $delay = 0.1, ?float $timeout = null): IRepeatAction
+	public function whileAllElementsMissing(array $selector, bool $isCaseSensitive = false, float $delay = 0.1, ?float $timeout = null): IRepeatAction
 	{
 		return (new Repeater($this, $this->config))->whileAllElementsMissing($selector, $isCaseSensitive, $delay, $timeout);
 	}
