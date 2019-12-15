@@ -43,5 +43,6 @@ class WhileThrowingLoop extends AbstractLoop
 	public function __construct(callable $callback, $delay, $timeout)
 	{
 		parent::__construct($delay, $timeout);
+		$this->callback = $callback;
 	}
 }

@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title>ElementRemoveOnClick</title>
+</head>
+<body>
+
+	<button onclick="remove">Remove</button>
+
+	<section>
+		<div id="div_1"></div>
+		<div id="div_2"></div>
+		<div id="div_3"></div>
+		<div id="div_4"></div>
+		<div id="div_5"></div>
+	</section>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script>
+		var count = 5;
+
+		function remove()
+		{
+			count--;
+			$('#div_' + count).remove();
+		}
+	</script>
+</body>
+</html>

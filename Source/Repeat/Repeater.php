@@ -77,7 +77,7 @@ class Repeater implements IRepeater, IRepeatAction
 	}
 	
 	
-	public function __construct(IQuery $parent, QueryConfig $config, ?callable $invoker = null)
+	public function __construct(IQuery $parent, QueryConfig $config)
 	{
 		$this->parent = $parent;
 		$this->config = $config;
