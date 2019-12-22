@@ -1,5 +1,5 @@
 <?php
-namespace SeTaco\Utils;
+namespace SeTaco\CLI\Drivers;
 
 
 use Objection\LiteObject;
@@ -12,7 +12,7 @@ use Structura\Arrays;
  * @property int $Major
  * @property int $Minor
  */
-class ChromeVersion extends LiteObject
+class ChromeVersionDriver extends LiteObject
 {
 	private function getVersion(): string
 	{
