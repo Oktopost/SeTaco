@@ -2,15 +2,18 @@
 namespace SeTaco\CLI\Drivers;
 
 
-use Objection\LiteObject;
 use Objection\LiteSetup;
-use SeTaco\Exceptions\SeTacoException;
+use Objection\LiteObject;
+
 use Structura\Arrays;
+use SeTaco\Exceptions\SeTacoException;
 
 
 /**
  * @property int $Major
  * @property int $Minor
+ * @property int $Build
+ * @property int $Patch
  */
 class ChromeVersionDriver extends LiteObject
 {
@@ -18,6 +21,7 @@ class ChromeVersionDriver extends LiteObject
 	{
 		$result = shell_exec('google-chrome --version | grep -iE "[0-9.]{10,20}"');
 		$result = explode(' ', trim($result));
+		
 		return Arrays::last($result);
 	}
 	
@@ -32,6 +36,8 @@ class ChromeVersionDriver extends LiteObject
 		
 		$this->Major = $parts[0];
 		$this->Minor = $parts[1];
+		$this->Build = $parts[2] ?? 0;
+		$this->Patch = $parts[3] ?? 0;
 	}
 	
 	
@@ -42,7 +48,9 @@ class ChromeVersionDriver extends LiteObject
 	{
 		return [
 			'Major' => LiteSetup::createInt(),
-			'Minor' => LiteSetup::createInt()
+			'Minor' => LiteSetup::createInt(),
+			'Build' => LiteSetup::createInt(),
+			'Patch' => LiteSetup::createInt()
 		];
 	}
 	
@@ -50,12 +58,19 @@ class ChromeVersionDriver extends LiteObject
 	public function __construct()
 	{
 		parent::__construct();
-		$this->setVersion();
 	}
-	
 	
 	public function __toString()
 	{
-		return $this->Major . '.' . $this->Minor;
+		return "{$this->Major}.{$this->Minor}.{$this->Build}.{$this->Patch}";
+	}
+	
+	
+	public static function current(): ChromeVersionDriver
+	{
+		$version = new ChromeVersionDriver();
+		$version->setVersion();
+		
+		return $version;
 	}
 }

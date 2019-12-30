@@ -2,20 +2,22 @@
 namespace SeTaco\CLI\Drivers;
 
 
+use Structura\Arrays;
+use Structura\Strings;
+
 use SeTaco\Exceptions\CLIException;
 
 
 class DriversFolderDriver
 {
-	private const CHROME_DRIVE_IDENTIFIER = 'chromedrive';
+	private const CHROME_DRIVE_IDENTIFIER = '.chromedrive';
 	
-	private $homeDir = null;
 	private $dir = null;
 	
 	
 	private function getFullName(string $version): string
 	{
-		return "$version." . self::CHROME_DRIVE_IDENTIFIER;
+		return Strings::endWith($version, self::CHROME_DRIVE_IDENTIFIER);
 	}
 	
 	private function getPathToVersion(string $version): string
@@ -23,10 +25,9 @@ class DriversFolderDriver
 		return $this->getPath($this->getFullName($version));
 	}
 	
-	
 	private function getPath(?string $to = null): string
 	{
-		$path = $this->homeDir . DIRECTORY_SEPARATOR . $this->dir;
+		$path = $this->dir;
 		
 		if ($to)
 		{
@@ -37,9 +38,8 @@ class DriversFolderDriver
 	}
 	
 	
-	public function __construct(string $homeDir, string $dir)
+	public function __construct(string $dir)
 	{
-		$this->homeDir = $homeDir;
 		$this->dir = $dir;
 	}
 	
@@ -69,22 +69,33 @@ class DriversFolderDriver
 		CLIException::throwIfLastErrorNotEmpty("Error when running `unlink('$path')`");
 	}
 	
-	public function clean(?string $match = null): void
+	public function clean(string $match = '*'): void
 	{
+		$all = $this->list($match);
 		
+		foreach ($all as $element)
+		{
+			$this->delete($element);
+		}
 	}
 	
-	public function getForVersion(string $major): string
+	public function getForVersion(string $version): string
 	{
-		
+		$major = explode('.', $version, 2)[0];
+		return $this->getForMajorVersion($major);
 	}
 	
-	public function getForMajorVersion(string $major): string
+	public function getForMajorVersion(string $major): ?string
 	{
+		$all = $this->list("$major.*");
 		
+		if (!$all)
+			return null;
+		
+		return $this->getPath(Arrays::last($all));
 	}
 	
-	public function store(string $file, string $version, bool $cleanup = true): void
+	public function store(string $file, string $version, bool $cleanup = true): string
 	{
 		$path = $this->getPathToVersion($version);
 		$this->delete($version);
@@ -100,23 +111,33 @@ class DriversFolderDriver
 			CLIException::throwIfLastErrorNotEmpty("Failed to unlink source file $file");
 		}
 		
-		
+		return $path;
 	}
 	
 	/**
 	 * @return string[]
 	 */
-	public function list(): array
+	public function list(string $filter = '*'): array
 	{
 		$path = $this->getPath();
-		$pattern = $path . '/*.' . self::CHROME_DRIVE_IDENTIFIER;
+		$pattern = $path . "/$filter" . self::CHROME_DRIVE_IDENTIFIER;
 		
-		error_clear_last();
 		$data = glob($pattern, GLOB_ERR);
 		
-		CLIException::throwIfLastErrorNotEmpty("There was an error while trying to execute glob('$pattern')");
+		if ($data === false)
+		{
+			throw new CLIException("There was an error while trying to execute glob('$pattern')");
+		}
 		
-		return [];
+		
+		foreach ($data as &$item)
+		{
+			$item = Strings::trimStart($item, $path . '/');
+		}
+		
+		sort($data);
+		
+		return $data;
 	}
 	
 	public function init(): void
