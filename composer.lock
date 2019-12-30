@@ -360,12 +360,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/unstable-cacao/Structura.git",
-                "reference": "f96505678886dff69094af29b5f62649b25c18f2"
+                "reference": "c63128c130c9fd7adfb8d48126c10943a14026b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/unstable-cacao/Structura/zipball/f96505678886dff69094af29b5f62649b25c18f2",
-                "reference": "f96505678886dff69094af29b5f62649b25c18f2",
+                "url": "https://api.github.com/repos/unstable-cacao/Structura/zipball/c63128c130c9fd7adfb8d48126c10943a14026b1",
+                "reference": "c63128c130c9fd7adfb8d48126c10943a14026b1",
                 "shasum": ""
             },
             "require": {
@@ -395,7 +395,7 @@
                 }
             ],
             "homepage": "https://github.com/unstable-cacao/Structura",
-            "time": "2019-12-30T13:34:15+00:00"
+            "time": "2019-12-30T15:58:14+00:00"
         },
         {
             "name": "unstable-cacao/traitor",

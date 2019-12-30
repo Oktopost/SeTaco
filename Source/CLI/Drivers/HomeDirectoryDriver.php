@@ -10,7 +10,7 @@ use SeTaco\BrowserType;
 
 class HomeDirectoryDriver
 {
-	public const DEFAULT_HOME_DIR	= '.ok-taco';
+	public const DEFAULT_HOME_DIR	= '.se-taco';
 	public const TEMP_DIRECTORY		= 'tmp';
 	public const SELENIUM_DIRECTORY	= 'selenium';
 	public const DRIVERS_DIR		= 'drivers';
@@ -45,6 +45,11 @@ class HomeDirectoryDriver
 	public function getSeleniumDirectory(): Path
 	{
 		return $this->path->append(self::SELENIUM_DIRECTORY);
+	}
+	
+	public function getSeleniumDirectoryDriver(): SeleniumDirectoryDriver
+	{
+		return new SeleniumDirectoryDriver($this->getSeleniumDirectory());
 	}
 	
 	public function getDriversDirectory($browserType = BrowserType::CHROME): Path
