@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afc2ef598c7bab73c65777e2bcace5ba",
+    "content-hash": "6b90ee59fa8e09e9f0e9374f3fe45d32",
     "packages": [
         {
             "name": "facebook/webdriver",
@@ -153,16 +153,16 @@
         },
         {
             "name": "oktopost/file-system",
-            "version": "0.0.1",
+            "version": "0.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Oktopost/FileSystem.git",
-                "reference": "bd1dd006c5b35b895a3c3466f6afcc7e1c465ec8"
+                "reference": "2740137ac374790a8b03acddd3b3511d25da41bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Oktopost/FileSystem/zipball/bd1dd006c5b35b895a3c3466f6afcc7e1c465ec8",
-                "reference": "bd1dd006c5b35b895a3c3466f6afcc7e1c465ec8",
+                "url": "https://api.github.com/repos/Oktopost/FileSystem/zipball/2740137ac374790a8b03acddd3b3511d25da41bd",
+                "reference": "2740137ac374790a8b03acddd3b3511d25da41bd",
                 "shasum": ""
             },
             "require": {
@@ -191,7 +191,7 @@
             ],
             "description": "PHP FileSystem Wrapper",
             "homepage": "https://github.com/Oktopost/FileSystem",
-            "time": "2019-12-30T06:48:20+00:00"
+            "time": "2019-12-30T09:37:56+00:00"
         },
         {
             "name": "oktopost/objection",
@@ -360,12 +360,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/unstable-cacao/Structura.git",
-                "reference": "cc8bb3d088ce65a9332fc05c825b0d7e17a7f86d"
+                "reference": "f96505678886dff69094af29b5f62649b25c18f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/unstable-cacao/Structura/zipball/cc8bb3d088ce65a9332fc05c825b0d7e17a7f86d",
-                "reference": "cc8bb3d088ce65a9332fc05c825b0d7e17a7f86d",
+                "url": "https://api.github.com/repos/unstable-cacao/Structura/zipball/f96505678886dff69094af29b5f62649b25c18f2",
+                "reference": "f96505678886dff69094af29b5f62649b25c18f2",
                 "shasum": ""
             },
             "require": {
@@ -395,7 +395,7 @@
                 }
             ],
             "homepage": "https://github.com/unstable-cacao/Structura",
-            "time": "2019-12-30T07:46:55+00:00"
+            "time": "2019-12-30T13:34:15+00:00"
         },
         {
             "name": "unstable-cacao/traitor",

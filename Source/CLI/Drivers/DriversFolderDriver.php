@@ -2,156 +2,191 @@
 namespace SeTaco\CLI\Drivers;
 
 
-use Structura\Arrays;
+use FileSystem\Path;
+
 use Structura\Strings;
+use Structura\Version;
 
 use SeTaco\Exceptions\CLIException;
 
 
 class DriversFolderDriver
 {
-	private const CHROME_DRIVE_IDENTIFIER = '.chromedrive';
+	private $type; 
 	
-	private $dir = null;
+	/** @var Path */
+	private $path;
 	
 	
-	private function getFullName(string $version): string
+	private function getDriverName(Version $for): string
 	{
-		return Strings::endWith($version, self::CHROME_DRIVE_IDENTIFIER);
+		return "{$this->type}.$for.driver";
 	}
 	
-	private function getPathToVersion(string $version): string
+	private function getDriverPath(Version $for): Path
 	{
-		return $this->getPath($this->getFullName($version));
+		return $this->path->append($this->getDriverName($for)); 
 	}
 	
-	private function getPath(?string $to = null): string
+	private function getVersionFromName(Path $path): ?Version
 	{
-		$path = $this->dir;
-		
-		if ($to)
-		{
-			$path .= DIRECTORY_SEPARATOR . $to;
-		}
-		
-		return $path;
-	}
-	
-	
-	public function __construct(string $dir)
-	{
-		$this->dir = $dir;
-	}
-	
-	
-	public function has(string $version): bool
-	{
-		$path = $this->getPathToVersion($version);
-		
-		error_clear_last();
-		$exists = @file_exists($path);
-		
-		CLIException::throwIfLastErrorNotEmpty("Error when running `file_exists('$path')`");
-		
-		return $exists;
-	}
-	
-	public function delete(string $version): void
-	{
-		if (!$this->has($version))
-			return;
-		
-		$path = $this->getPathToVersion($version);
-		
-		error_clear_last();
-		@unlink($path);
-		
-		CLIException::throwIfLastErrorNotEmpty("Error when running `unlink('$path')`");
-	}
-	
-	public function clean(string $match = '*'): void
-	{
-		$all = $this->list($match);
-		
-		foreach ($all as $element)
-		{
-			$this->delete($element);
-		}
-	}
-	
-	public function getForVersion(string $version): string
-	{
-		$major = explode('.', $version, 2)[0];
-		return $this->getForMajorVersion($major);
-	}
-	
-	public function getForMajorVersion(string $major): ?string
-	{
-		$all = $this->list("$major.*");
-		
-		if (!$all)
+		if (!$path->isFile())
 			return null;
 		
-		return $this->getPath(Arrays::last($all));
-	}
-	
-	public function store(string $file, string $version, bool $cleanup = true): string
-	{
-		$path = $this->getPathToVersion($version);
-		$this->delete($version);
+		$fileName = $path->name();
 		
-		error_clear_last();
-		@copy($file, $path);
-		
-		CLIException::throwIfLastErrorNotEmpty("copy command failed for '$file' -> '$path'");
-		
-		if ($cleanup)
+		if (!Strings::isEndsWith($fileName, '.driver') || 
+			!Strings::isStartsWith($fileName, $this->type . '.'))
 		{
-			@unlink($file);
-			CLIException::throwIfLastErrorNotEmpty("Failed to unlink source file $file");
+			return null;
 		}
 		
-		return $path;
+		$version = Strings::trimStart($fileName, $this->type . '.');
+		$version = Strings::trimEnd($version, '.driver');
+		
+		if (substr_count($version, '.') != 3)
+		{
+			return null;
+		}
+		
+		return new Version($version);
+	}
+	
+	
+	public function __construct($path, string $type)
+	{
+		$this->path = Path::getPathObject($path);
+		$this->type = $type;
+	}
+	
+	
+	/**
+	 * @param Version|string 
+	 * @return bool
+	 */
+	public function has($version): bool
+	{
+		return $this
+			->getDriverPath(new Version($version))
+			->exists();
 	}
 	
 	/**
-	 * @return string[]
+	 * @param Version|string 
+	 * @return ?Path
 	 */
-	public function list(string $filter = '*'): array
+	public function get($version): ?Path
 	{
-		$path = $this->getPath();
-		$pattern = $path . "/$filter" . self::CHROME_DRIVE_IDENTIFIER;
-		
-		$data = glob($pattern, GLOB_ERR);
-		
-		if ($data === false)
-		{
-			throw new CLIException("There was an error while trying to execute glob('$pattern')");
-		}
-		
-		
-		foreach ($data as &$item)
-		{
-			$item = Strings::trimStart($item, $path . '/');
-		}
-		
-		sort($data);
-		
-		return $data;
+		$path = $this->getDriverPath(new Version($version));
+		return $path->exists() ? $path : null;
 	}
 	
-	public function init(): void
+	/**
+	 * @param Version|string $version
+	 */
+	public function delete($version): void
 	{
-		$path = $this->getPath();
+		$this
+			->getDriverPath(new Version($version))
+			->unlink();
+	}
+	
+	/**
+	 * @return Version[]
+	 */
+	public function listVersions(): array
+	{
+		$items = $this->path->scandir();
+		$versions = [];
 		
-		error_clear_last();
-		$exists = @is_dir($path);
-		CLIException::throwIfLastErrorNotEmpty("Error in `mkdir` when trying to create $path");
-		
-		if (!$exists)
+		foreach ($items as $item)
 		{
-			@mkdir($path, 0777, true);
-			CLIException::throwIfLastErrorNotEmpty("Error in `mkdir` when trying to create $path");
+			$version = $this->getVersionFromName($item);
+			
+			if ($version)
+			{
+				$versions[] = $version;
+			}
+		}
+		
+		usort($versions, function (Version $a, Version $b)
+		{
+			if ($a->isSame($b)) return 0;
+			else if ($a->isLower($b)) return -1;
+			else return 1;
+		});
+		
+		return $versions;
+	}
+	
+	/**
+	 * At least major version must match, and only same or lower version will be excepted.
+	 * 
+	 * @param string|Version $forVersion
+	 * @return ?Version
+	 */
+	public function getBestMatch($forVersion): ?Version
+	{
+		$version = new Version($forVersion);
+		$matching = null;
+	
+		foreach ($this->listVersions() as $existingVersion)
+		{
+			if ($existingVersion->isHigher($version))
+			{
+				break;
+			}
+			else if ($existingVersion->getMajor() == $version->getMajor())
+			{
+				$matching = $existingVersion;
+			}
+		}
+		
+		return $matching;
+	}
+	
+	public function cleanup($currentVersion, int $driversToKeep = 5): void
+	{
+		$version = new Version($currentVersion);
+		$driversKept = 0;
+		
+		/** @var Version[] $newestFirstVersions */
+		$newestFirstVersions = array_reverse($this->listVersions());
+	
+		foreach ($newestFirstVersions as $existingVersion)
+		{
+			if ($existingVersion->isHigher($version))
+			{
+				$this->delete($existingVersion);
+			}
+			else if ($driversKept >= $driversToKeep)
+			{
+				$this->delete($existingVersion);
+			}
+			else 
+			{
+				$driversKept++;	
+			}
+		}
+	}
+	
+	/**
+	 * @param string|Path $file
+	 * @param string|Version $version
+	 * @param bool $cleanup
+	 */
+	public function store($file, $version, bool $cleanup = true): void
+	{
+		$file = Path::getPathObject($file);
+		$version = new Version($version);
+		
+		$path = $this->getDriverPath($version);
+		
+		$file->copyFile($path);
+		
+		if ($cleanup)
+		{
+			$file->unlink();
 		}
 	}
 }
