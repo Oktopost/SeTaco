@@ -3,12 +3,12 @@
 
 function getPid
 {
-    ps ax | grep vendor/bin/selenium.jar | grep -v grep | awk {'print $1'}
+    ps ax | grep selenium.*.jar | grep -v grep | awk {'print $1'}
 }
 
 function getPgid
 {
-    ps x -o pgid,cmd | grep vendor/bin/selenium.jar | grep -v grep | awk {'print $1'}
+    ps x -o pgid,cmd | grep selenium.*.jar | grep -v grep | awk {'print $1'}
 }
 
 

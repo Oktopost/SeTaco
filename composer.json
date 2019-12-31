@@ -41,14 +41,7 @@
 	},
     "scripts": 
 	{
-		"post-install-cmd": [
-			"SeTaco\\Utils\\ComposerUtils::composerPostInstallHook"
-		],
-		"test": "SeTaco\\Utils\\Test::test",
-        "test-cover": "SeTaco\\Utils\\Test::testCover"
-    },
-	"config": 
-	{
-		"process-timeout": 0
-	}
+		"test": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests",
+		"test-cover": "./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests --coverage-html ./build/cover"
+    }
 }

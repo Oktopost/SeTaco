@@ -3,16 +3,16 @@ namespace SeTaco\CLI;
 
 
 use SeTaco\BrowserType;
-use SeTaco\CLI\Drivers\ChromeVersionDriver;
-use SeTaco\CLI\Drivers\HomeDirectoryDriver;
-use SeTaco\CLI\Drivers\SeleniumDownloadDriver;
-use SeTaco\CLI\Drivers\SeleniumDriver;
 use SeTaco\CLI\Objects\RunConfig;
 use SeTaco\CLI\Objects\SeleniumInstance;
+use SeTaco\CLI\Drivers\SeleniumDriver;
+use SeTaco\CLI\Drivers\ChromeVersionDriver;
+use SeTaco\CLI\Drivers\HomeDirectoryDriver;
 use SeTaco\CLI\Operations\ChromeDriverDownloadOperation;
 use SeTaco\CLI\Operations\SeleniumDownloadOperation;
 use SeTaco\Exceptions\CLIException;
 use SeTaco\Exceptions\SeTacoException;
+
 use Structura\Version;
 
 
