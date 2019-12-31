@@ -10,7 +10,13 @@ use Structura\URL;
 
 class BrowserSession implements IBrowserSession
 {
+	public static $start_selenium = true;
+	
+	
 	private const DEFAULT_BROWSER_NAME = 'defaultBrowser';
+	
+	
+	private static $selenium_started = false;
 	
 	
 	/** @var TacoConfig */
@@ -33,6 +39,12 @@ class BrowserSession implements IBrowserSession
 	
 	private function openBrowser(string $browserName, TargetConfig $targetConfig, ?string $targetName = null): IBrowser
 	{
+		if (self::$start_selenium && !self::$selenium_started)
+		{
+			self::$selenium_started = true;
+			SeTaco::startSeleniumIfNotRunning_CLI();
+		}
+		
 		if ($this->hasBrowser($browserName))
 		{
 			$this->close($browserName);
