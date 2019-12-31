@@ -2,8 +2,12 @@
 namespace SeTaco\CLI\Drivers;
 
 
+use FileSystem\Path;
+use FileSystem\TempFile;
 use SeTaco\CLI\PHPOS;
 use SeTaco\Exceptions\CLIException;
+use Structura\Random;
+use Structura\Version;
 use Traitor\TStaticClass;
 
 
@@ -40,9 +44,9 @@ class ChromeDriversDownloadDriver
 		return 'chromedriver_' . self::FILE_NAME_BY_OS[$os] . '.zip';
 	}
 	
-	private static function unzip(string $zipFile, string $toFile): void
+	private static function unzip(TempFile $zipFile, Path $toFile): void
 	{
-		$extractFolder = $toFile . '.extracted';
+		$extractFolder = new Path($zipFile->path()->get() . '.extracted');
 		
 		$archive = new \ZipArchive();
 		$result = $archive->open($zipFile);
@@ -54,19 +58,16 @@ class ChromeDriversDownloadDriver
 		
 		$driverName = $archive->getNameIndex(0);
 		
-		if (!$archive->extractTo($extractFolder, $driverName))
+		if (!$archive->extractTo($extractFolder->get(), $driverName))
 		{
 			throw new CLIException("Failed to extract from archive '$zipFile' to '$extractFolder'");
 		}
 		
 		$archive->close();
-		$extractedFile = "$extractFolder/$driverName";
-		@rename($extractedFile, $toFile);
+		$extractedFile = $extractFolder->append($driverName);
+		$extractedFile->moveFile($toFile);
 		
-		CLIException::throwIfLastErrorNotEmpty("Failed to move driver after unzip. From '$extractedFile' to '$toFile'");
-		
-		@rmdir($extractFolder);
-		CLIException::throwIfLastErrorNotEmpty("Failed to delete temporary directory '$extractFolder'");
+		$extractFolder->delete();
 	}
 	
 	
@@ -75,7 +76,7 @@ class ChromeDriversDownloadDriver
 		self::$dataCache = null;
 	}
 	
-	public static function getLatestForVersion(string $major): string
+	public static function getLatestForVersion(string $major): Version
 	{
 		$path = self::URL . self::LATEST_RELEASE_FILE_PREFIX . $major;
 		
@@ -83,29 +84,27 @@ class ChromeDriversDownloadDriver
 		$result = @file_get_contents(self::URL . self::LATEST_RELEASE_FILE_PREFIX . $major);
 		CLIException::throwIfLastErrorNotEmpty("Failed to fetch latest version. URL '$path' is not accessible");
 		
-		return $result;
+		return new Version($result);
 	}
 	
-	public static function downloadVersion(string $version, string $targetFile, ?string $os = null): void
+	public static function downloadVersion(Version $version, Path $targetFile, ?string $os = null): void
 	{
-		$tempZipFile = $targetFile . '.' . mt_rand() . '.zip';
+		$zipPath = $targetFile->back()->append(Random::string(32) . '.' . $version->format() . '.zip');
+		$tempZipFile = new TempFile($zipPath);
 		
 		$fileName = self::getFileNameForOS($os);
-		$path = self::URL . "$version/$fileName";
+		$path = self::URL . "{$version->format()}/$fileName";
 		
 		error_clear_last();
 		$driver = @file_get_contents($path);
 		CLIException::throwIfLastErrorNotEmpty("Failed to download driver '$path'");
 		
 		// Store zip
-		@file_put_contents($tempZipFile, $driver);
-		CLIException::throwIfLastErrorNotEmpty("Failed to store zipped driver to temporary file '$tempZipFile'");
+		@file_put_contents($tempZipFile->path()->get(), $driver);
+		CLIException::throwIfLastErrorNotEmpty(
+			"Failed to store zipped driver to temporary file '{$tempZipFile->path()}'");
 		
 		// Unzip
 		self::unzip($tempZipFile, $targetFile);
-		
-		// Unlink temp zip file
-		@unlink($tempZipFile);
-		CLIException::throwIfLastErrorNotEmpty("Failed to delete temporary zipped driver at '$tempZipFile'");
 	}
 }

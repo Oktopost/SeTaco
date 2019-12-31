@@ -5,6 +5,7 @@ namespace SeTaco\CLI\Drivers;
 use FileSystem\FS;
 use FileSystem\Path;
 
+use FileSystem\TempFile;
 use SeTaco\BrowserType;
 
 
@@ -62,6 +63,11 @@ class HomeDirectoryDriver
 	{
 		$path = $this->getDriversDirectory($browserType);
 		return new DriversFolderDriver($path, $browserType);
+	}
+	
+	public function getTempFile(): TempFile
+	{
+		return TempFile::create($this->getTempDirectory(), false);
 	}
 	
 	

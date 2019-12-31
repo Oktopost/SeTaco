@@ -2,13 +2,14 @@
 namespace SeTaco\CLI\Operations;
 
 
+use SeTaco\BrowserType;
 use SeTaco\CLI\Dialog;
-use SeTaco\CLI\Drivers\ChromeDriversDownloadDriver;
 use SeTaco\CLI\Drivers\ChromeVersionDriver;
-use SeTaco\CLI\Drivers\TempFolder;
-use SeTaco\CLI\Drivers\DriversFolderDriver;
+use SeTaco\CLI\Drivers\HomeDirectoryDriver;
+use SeTaco\CLI\Drivers\ChromeDriversDownloadDriver;
 
 use Traitor\TStaticClass;
+use Structura\Version;
 
 
 class ChromeDriverDownloadOperation
@@ -16,28 +17,25 @@ class ChromeDriverDownloadOperation
 	use TStaticClass;
 	
 	
-	public static function checkAndDownload(TempFolder $tempFolder, DriversFolderDriver $driverFolder): ?string
+	public static function checkAndDownload(HomeDirectoryDriver $home): ?Version
 	{
-		$version = ChromeVersionDriver::current();
+		$version = new Version(ChromeVersionDriver::getVersion());
+		$tempFile = $home->getTempFile();
+		$driverFolder = $home->getDriversDirectoryDriver(BrowserType::CHROME);
 		
-		$driverFile = $driverFolder->getForMajorVersion($version->Major);
+		Dialog::printLn("Currently installed chrome version is " . $version->format());
+		Dialog::printLn("You don't have driver installed for this version. New driver will be downloaded...");
 		
-		if ($driverFile)
-			return $driverFile;
+		$latestVersion = ChromeDriversDownloadDriver::getLatestForVersion($version->getMajor());
 		
-		Dialog::printLn("Currently installed chrome version is " . $version);
-		Dialog::printLn("You don't have driver installed for this version.");
+		Dialog::printLn("Latest driver available: {$latestVersion->format()}. Downloading...");
 		
-		if (!Dialog::askYesNo("Download drivers?"))
-		{
-			return null;
-		}
+		ChromeDriversDownloadDriver::downloadVersion($latestVersion, $tempFile->path());
+		$driverFolder->store($tempFile->path(), $latestVersion);
 		
-		$tempFile = $tempFolder->getTempFile();
+		Dialog::printLn("Download complete...");
+		$driverFolder->cleanup($latestVersion);
 		
-		$latestVersion = ChromeDriversDownloadDriver::getLatestForVersion($version->Major);
-		ChromeDriversDownloadDriver::downloadVersion($latestVersion, $tempFile);
-		
-		return $driverFolder->store($tempFile, (string)$version, true);
+		return new Version($latestVersion);
 	}
 }

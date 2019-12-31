@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6b90ee59fa8e09e9f0e9374f3fe45d32",
+    "content-hash": "dfb2c6f793e6cf2bb6e6d5ce29e6aab3",
     "packages": [
         {
             "name": "facebook/webdriver",
@@ -153,19 +153,20 @@
         },
         {
             "name": "oktopost/file-system",
-            "version": "0.0.3",
+            "version": "0.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Oktopost/FileSystem.git",
-                "reference": "2740137ac374790a8b03acddd3b3511d25da41bd"
+                "reference": "fff824e8500b15762da7cad6df7d3793dffb44c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Oktopost/FileSystem/zipball/2740137ac374790a8b03acddd3b3511d25da41bd",
-                "reference": "2740137ac374790a8b03acddd3b3511d25da41bd",
+                "url": "https://api.github.com/repos/Oktopost/FileSystem/zipball/fff824e8500b15762da7cad6df7d3793dffb44c1",
+                "reference": "fff824e8500b15762da7cad6df7d3793dffb44c1",
                 "shasum": ""
             },
             "require": {
+                "unstable-cacao/structura": "^2.1",
                 "unstable-cacao/traitor": "^1.0"
             },
             "require-dev": {
@@ -191,7 +192,7 @@
             ],
             "description": "PHP FileSystem Wrapper",
             "homepage": "https://github.com/Oktopost/FileSystem",
-            "time": "2019-12-30T09:37:56+00:00"
+            "time": "2019-12-31T14:20:51+00:00"
         },
         {
             "name": "oktopost/objection",

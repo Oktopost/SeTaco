@@ -2,30 +2,24 @@
 namespace SeTaco\CLI;
 
 
-use SeTaco\CLI\Drivers\TempFolder;
-use SeTaco\CLI\Drivers\DriversFolderDriver;
+use SeTaco\BrowserType;
+use SeTaco\CLI\Drivers\ChromeVersionDriver;
+use SeTaco\CLI\Drivers\HomeDirectoryDriver;
+use SeTaco\CLI\Drivers\SeleniumDownloadDriver;
+use SeTaco\CLI\Drivers\SeleniumDriver;
+use SeTaco\CLI\Objects\RunConfig;
+use SeTaco\CLI\Objects\SeleniumInstance;
 use SeTaco\CLI\Operations\ChromeDriverDownloadOperation;
-
+use SeTaco\CLI\Operations\SeleniumDownloadOperation;
 use SeTaco\Exceptions\CLIException;
+use SeTaco\Exceptions\SeTacoException;
+use Structura\Version;
 
 
 class CLIController
 {
-	private const TEMP_DIR			= 'tmp';
-	private const CHROME_DRIVER_DIR	= 'drivers/chrome';
-	private const DEFAULT_HOME		= '.ok-taco';
-	
-	
-	private $homeDir;
-	
-	/** @var TempFolder */
-	private $tempDir;
-	
-	
-	private function createChromeDirectoryDriver(): DriversFolderDriver 
-	{
-		return new DriversFolderDriver($this->homeDir . DIRECTORY_SEPARATOR . self::CHROME_DRIVER_DIR);	
-	}
+	/** @var HomeDirectoryDriver */
+	private $home;
 	
 	
 	public function __construct(?string $dir = null)
@@ -38,47 +32,99 @@ class CLIController
 					'Please specify path to home directory for SeTaco');
 			}
 			
-			$dir = $_SERVER['HOME'] . '/' . self::DEFAULT_HOME;	
+			$dir = '~/' . HomeDirectoryDriver::DEFAULT_HOME_DIR;	
 		}
 		
-		$this->homeDir = $dir;
-		$this->tempDir = new TempFolder($dir . '/' . self::TEMP_DIR);
+		$this->home = new HomeDirectoryDriver($dir);
+		$this->home->initialize();
 	}
 	
 	
-	public function init(): void
+	public function validateChromeDriverVersion(): ?Version
 	{
-		if (!is_dir($this->homeDir))
+		$drivers = $this->home->getDriversDirectoryDriver(BrowserType::CHROME);
+		$version = ChromeVersionDriver::getVersion();
+		
+		$bestMatch = $drivers->getBestMatch($version);
+		
+		if ($bestMatch)
+			return $bestMatch;
+		
+		return ChromeDriverDownloadOperation::checkAndDownload($this->home);
+	}
+	
+	public function validateSeleniumVersion(): void
+	{
+		if (SeleniumDriver::isRunning())
 		{
-			@mkdir($this->homeDir);
-			CLIException::throwIfLastErrorNotEmpty("Failed to create home directory '$this->homeDir'");
+			return;
 		}
 		
-		$this->tempDir->create();
-		$this->tempDir->cleanup();
+		$seleniumDirDriver = $this->home->getSeleniumDirectoryDriver();
 		
-		$driverFolder = $this->createChromeDirectoryDriver();
-		$driverFolder->init();
-	}
-	
-	
-	public function getDriverForChrome(): ?string
-	{
-		$driverFolder = $this->createChromeDirectoryDriver();
-		return ChromeDriverDownloadOperation::checkAndDownload($this->tempDir, $driverFolder);
-	}
-	
-	public function clearDriversFolder(): void
-	{
-		$this->createChromeDirectoryDriver()->clean();
-	}
-	
-	
-	public static function create(?string $dir = null): CLIController
-	{
-		$controller = new CLIController($dir);
-		$controller->init();
+		if ($seleniumDirDriver->getLatestVersion())
+		{
+			return;
+		}
 		
-		return $controller;
+		SeleniumDownloadOperation::downloadSelenium($this->home);
+	}
+	
+	public function initializeRunConfig(): ?RunConfig
+	{
+		$config = new RunConfig();
+		
+		$chromeVersion = self::validateChromeDriverVersion();
+		self::validateSeleniumVersion();
+		
+		if (!$chromeVersion)
+		{
+			throw new SeTacoException('Could not load appropriate chrome driver');
+		}
+		
+		$config->ChromeDriverVersion = $chromeVersion;
+		$config->ChromeDriverPath = $this->home->getDriversDirectoryDriver()->get($chromeVersion);
+		
+		if (!SeleniumDriver::isRunning())
+		{
+			$seleniumDirDriver = $this->home->getSeleniumDirectoryDriver();
+			
+			$config->SeleniumVersion = $seleniumDirDriver->getLatestVersion();
+			$config->SeleniumPath = $seleniumDirDriver->getLatest(); 
+		}
+		
+		return $config;
+	}
+	
+	public function runSelenium(): void
+	{
+		if (SeleniumDriver::isRunning())
+		{
+			SeleniumInstance::instance()->doNothingOnShutdown();
+			Dialog::printLn("Selenium already running...");
+			return;
+		}
+		
+		Dialog::printLn("Starting selenium...");
+		
+		$config = $this->initializeRunConfig();
+		
+		Dialog::printLn("");
+		Dialog::printLn("With Config:");
+		Dialog::printLn("------------");
+		Dialog::printLn("\tChrome:   " . $config->ChromeDriverVersion . " at " . $config->ChromeDriverPath);
+		Dialog::printLn("\tSelenium: " . $config->SeleniumVersion. " at " . $config->SeleniumPath);
+		Dialog::printLn("");
+		
+		SeleniumDriver::startSelenium($config);
+		
+		Dialog::printLn("Selenium running...");
+		
+		SeleniumInstance::instance()->stopOnShutdown();
+	}
+	
+	public function homeDriver(): HomeDirectoryDriver
+	{
+		return $this->home;
 	}
 }

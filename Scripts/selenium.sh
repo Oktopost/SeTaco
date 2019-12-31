@@ -17,7 +17,7 @@ case $1 in
     getPid
     ;;
   start*)
-    nohup java -Dwebdriver.chrome.driver="vendor/bin/chromedriver" -jar vendor/bin/selenium.jar > /tmp/selenium.out 2>&1&
+    nohup java -Dwebdriver.chrome.driver="$2" -jar $3 > /tmp/selenium.out 2>&1&
     if [ "`getPid`" == "" ]; then
         echo "Failed stop start selenium"
     else

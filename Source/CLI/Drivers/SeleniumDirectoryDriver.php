@@ -26,12 +26,16 @@ class SeleniumDirectoryDriver
 		$name = $path->name();
 		
 		if (!Strings::isStartsWith($name, 'selenium.') ||
-			substr_count($name, '.') != 4)
+			!Strings::isEndsWith($name, '.jar') ||
+			substr_count($name, '.') != 5)
 		{
 			return null;
 		}
 		
-		return new Version(Strings::trimStart($name, 'selenium.'));
+		return new Version(
+			Strings::trimStart(
+				Strings::trimEnd($name, '.jar'), 
+			'selenium.'));
 	}
 	
 	
