@@ -2,6 +2,7 @@
 namespace SeTaco\CLI\Drivers;
 
 
+use SeTaco\CLI\PHPOS;
 use Structura\Arrays;
 use Structura\Version;
 
@@ -15,14 +16,13 @@ class ChromeVersionDriver
 	
 	public static function getVersion(): string
 	{
-		switch(PHP_OS)
+		if (PHPOS::isMac())
 		{
-			case 'Darwin':
-				$exec = '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome';
-				break;
-			default:
-				$exec = 'google-chrome';
-				break;
+			$exec = '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome';
+		}
+		else
+		{
+			$exec = 'google-chrome';
 		}
 
 		$result = shell_exec($exec . ' --version | grep -iE "[0-9.]{10,20}"');
