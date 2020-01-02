@@ -76,12 +76,12 @@ class ChromeDriversDownloadDriver
 		self::$dataCache = null;
 	}
 	
-	public static function getLatestForVersion(string $major): Version
+	public static function getLatestForVersion(Version $v): Version
 	{
-		$path = self::URL . self::LATEST_RELEASE_FILE_PREFIX . $major;
+		$path = self::URL . self::LATEST_RELEASE_FILE_PREFIX . $v->format('M.m.b');
 		
 		error_clear_last();
-		$result = @file_get_contents(self::URL . self::LATEST_RELEASE_FILE_PREFIX . $major);
+		$result = @file_get_contents($path);
 		CLIException::throwIfLastErrorNotEmpty("Failed to fetch latest version. URL '$path' is not accessible");
 		
 		return new Version($result);
@@ -104,7 +104,6 @@ class ChromeDriversDownloadDriver
 		CLIException::throwIfLastErrorNotEmpty(
 			"Failed to store zipped driver to temporary file '{$tempZipFile->path()}'");
 		
-		// Unzip
 		self::unzip($tempZipFile, $targetFile);
 	}
 }

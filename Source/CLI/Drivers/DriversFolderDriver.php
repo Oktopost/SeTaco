@@ -3,11 +3,8 @@ namespace SeTaco\CLI\Drivers;
 
 
 use FileSystem\Path;
-
 use Structura\Strings;
 use Structura\Version;
-
-use SeTaco\Exceptions\CLIException;
 
 
 class DriversFolderDriver
@@ -132,7 +129,7 @@ class DriversFolderDriver
 	
 		foreach ($this->listVersions() as $existingVersion)
 		{
-			if ($existingVersion->isHigher($version))
+			if ($existingVersion->isHigher($version) && $existingVersion->format('M.m') != $version->format('M.m'))
 			{
 				break;
 			}

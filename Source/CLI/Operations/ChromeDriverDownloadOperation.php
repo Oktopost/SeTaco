@@ -26,7 +26,7 @@ class ChromeDriverDownloadOperation
 		Dialog::printLn("Currently installed chrome version is " . $version->format());
 		Dialog::printLn("You don't have driver installed for this version. New driver will be downloaded...");
 		
-		$latestVersion = ChromeDriversDownloadDriver::getLatestForVersion($version->getMajor());
+		$latestVersion = ChromeDriversDownloadDriver::getLatestForVersion($version);
 		
 		Dialog::printLn("Latest driver available: {$latestVersion->format()}. Downloading...");
 		

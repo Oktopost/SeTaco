@@ -32,7 +32,8 @@
 		"oktopost/objection": "^1.0",
 		"oktopost/file-system": "^0.0",
 		"facebook/webdriver": "^1.6",
-		"oktopost/cartograph": "^1.1"
+		"oktopost/cartograph": "^1.1",
+		"ext-zip": "*"
 	},
 	"require-dev":
 	{
