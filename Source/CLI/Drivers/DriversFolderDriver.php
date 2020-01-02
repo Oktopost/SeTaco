@@ -183,6 +183,7 @@ class DriversFolderDriver
 		$path = $this->getDriverPath($version);
 		
 		$file->copyFile($path);
+		$path->chmod(0754);
 		
 		if ($cleanup)
 		{

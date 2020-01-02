@@ -153,16 +153,16 @@
         },
         {
             "name": "oktopost/file-system",
-            "version": "0.0.10",
+            "version": "0.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Oktopost/FileSystem.git",
-                "reference": "fff824e8500b15762da7cad6df7d3793dffb44c1"
+                "reference": "d2739b97aec998bcdb9014704ce56921da6beff9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Oktopost/FileSystem/zipball/fff824e8500b15762da7cad6df7d3793dffb44c1",
-                "reference": "fff824e8500b15762da7cad6df7d3793dffb44c1",
+                "url": "https://api.github.com/repos/Oktopost/FileSystem/zipball/d2739b97aec998bcdb9014704ce56921da6beff9",
+                "reference": "d2739b97aec998bcdb9014704ce56921da6beff9",
                 "shasum": ""
             },
             "require": {
@@ -192,7 +192,7 @@
             ],
             "description": "PHP FileSystem Wrapper",
             "homepage": "https://github.com/Oktopost/FileSystem",
-            "time": "2019-12-31T14:20:51+00:00"
+            "time": "2020-01-02T07:14:23+00:00"
         },
         {
             "name": "oktopost/objection",

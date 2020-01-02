@@ -118,6 +118,9 @@ class CLIController
 		
 		SeleniumDriver::startSelenium($config);
 		
+		// Wait for selenium to start (0.5 sec)
+		usleep(500 * 1000);
+		
 		Dialog::printLn("Selenium running...");
 		
 		SeleniumInstance::instance()->stopOnShutdown();
