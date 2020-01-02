@@ -10,6 +10,14 @@ class Dialog
 	use TStaticClass;
 	
 	
+	private static $isSilent = false;
+	
+	
+	public static function silent(): void
+	{
+		self::$isSilent = true;
+	}
+	
 	public static function ask(string $question): string
 	{
 		return readline($question);
@@ -43,11 +51,17 @@ class Dialog
 	
 	public static function printLn(string $text): void
 	{
+		if (self::$isSilent)
+			return;
+		
 		echo $text . PHP_EOL;
 	}
 	
 	public static function printErrorLn(string $error): void
 	{
+		if (self::$isSilent)
+			return;
+		
 		echo "\033[91mError: $error\033[0m" . PHP_EOL;
 	}
 }
